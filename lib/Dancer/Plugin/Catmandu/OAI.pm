@@ -1,4 +1,4 @@
-package Dancer::Plugin::Catmandu::OAI; # TODO deletedRecord=persistent, hierarchical sets, setDescription
+package Dancer::Plugin::Catmandu::OAI; # TODO hierarchical sets, setDescription
 
 =head1 NAME
 
@@ -20,6 +20,8 @@ use Catmandu::Exporter::Template;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
+
+my $DEFAULT_LIMIT = 100;
 
 my $VERBS = {
     GetRecord => {
@@ -60,7 +62,6 @@ sub render {
 sub oai_provider {
     my ($path, %opts) = @_;
 
-
     my $setting = plugin_setting;
 
     my $metadata_formats = do {
@@ -91,6 +92,28 @@ sub oai_provider {
     };
 
     my $ns = "oai:$setting->{repositoryIdentifier}:";
+
+    my $branding = "";
+    if (my $icon = $setting->{collectionIcon}) {
+        if (my $url = $icon->{url}) {
+            $branding .= <<TT;
+<description>
+<branding xmlns="http://www.openarchives.org/OAI/2.0/branding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/branding/ http://www.openarchives.org/OAI/2.0/branding.xsd">
+<collectionIcon>
+<url>$url</url>
+TT
+            for my $tag (qw(link title width height)) {
+                my $val = $icon->{$tag} // next;
+                $branding .= "<$tag>$val</$tag>\n";
+            }
+
+            $branding .= <<TT;
+</collectionIcon>
+</branding>
+</description>
+TT
+        }
+    }
 
     my $template_header = <<TT;
 <?xml version="1.0" encoding="UTF-8"?>
@@ -162,6 +185,7 @@ $template_header
         <sampleIdentifier>$setting->{sampleIdentifier}</sampleIdentifier>
     </oai-identifier>
 </description>
+$branding
 </Identify>
 $template_footer
 TT
@@ -359,7 +383,7 @@ TT
             return render(\$template_identify, $vars);
 
         } elsif ($verb eq 'ListIdentifiers' || $verb eq 'ListRecords') {
-            my $limit = 100;
+            my $limit = $setting->{limit} // $DEFAULT_LIMIT;
             my $start = $vars->{start} //= 0;
             my $from  = $params->{from};
             my $until = $params->{until};
@@ -374,7 +398,7 @@ TT
 
             if ($from && $until && length($from) != length($until)) {
                 push @$errors, [badArgument => "datestamps must have the same granularity"];
-                return render(\$template_error, $vars);                
+                return render(\$template_error, $vars);
             }
 
             if ($from && $until && $from gt $until) {
