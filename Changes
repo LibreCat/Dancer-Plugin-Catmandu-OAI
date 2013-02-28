@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0301  2013-02-28
+       - explicit DateTime dependency
+
 0.03    2013-02-25
        - configurable limit (default is 100)
        - support collectionIcon

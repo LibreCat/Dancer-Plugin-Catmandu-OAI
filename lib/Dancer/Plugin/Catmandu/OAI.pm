@@ -6,11 +6,11 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =head1 VERSION
 
-Version 0.03
+Version 0.0301
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.0301';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(:is);
