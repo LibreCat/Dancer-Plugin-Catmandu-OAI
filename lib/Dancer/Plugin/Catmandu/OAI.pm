@@ -6,11 +6,11 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =head1 VERSION
 
-Version 0.0301
+Version 0.0302
 
 =cut
 
-our $VERSION = '0.0301';
+our $VERSION = '0.0302';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(:is);
@@ -435,7 +435,12 @@ TT
                 return render(\$template_error, $vars);
             }
             if ($start + $limit < $search->total) {
-                $vars->{token} = join '!', $params->{set} || '', $from || '', $until || '', $params->{metadataPrefix}, $start + $limit;
+                $vars->{token} = join '!',
+                    $params->{set} || '',
+                    $from ? _combined_utc_datestamp($from) : '',
+                    $until ? _combined_utc_datestamp($until) : '',
+                    $params->{metadataPrefix},
+                    $start + $limit;
             }
             $vars->{total} = $search->total;
 

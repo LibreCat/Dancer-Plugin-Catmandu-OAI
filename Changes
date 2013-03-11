@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0302  2013-03-11
+       - fix date format in resumptionToken
+
 0.0301  2013-02-28
        - explicit DateTime dependency
 
