@@ -171,10 +171,10 @@ $template_header
 <repositoryName>$setting->{repositoryName}</repositoryName>
 <baseURL>[% request.uri %]</baseURL>
 <protocolVersion>2.0</protocolVersion>
+<adminEmail>$setting->{adminEmail}</adminEmail>
 <earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
 <deletedRecord>$setting->{deletedRecord}</deletedRecord>
 <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
-<adminEmail>$setting->{adminEmail}</adminEmail>
 <description>
     <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
