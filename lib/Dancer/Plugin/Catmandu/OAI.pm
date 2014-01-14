@@ -236,8 +236,8 @@ TT
         $template_list_metadata_formats .= <<TT;
 <metadataFormat>
     <metadataPrefix>$format->{metadataPrefix}</metadataPrefix>
-    <metadataNamespace>$format->{metadataNamespace}</metadataNamespace>
     <schema>$format->{schema}</schema>
+    <metadataNamespace>$format->{metadataNamespace}</metadataNamespace>
 </metadataFormat>
 TT
     }
@@ -353,7 +353,7 @@ TT
             return render(\$template_error, $vars);
         }
 
-        content_type 'xml';
+        content_type 'text/xml';
 
         if ($verb eq 'GetRecord') {
             my $id = $params->{identifier};
