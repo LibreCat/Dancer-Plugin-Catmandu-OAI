@@ -171,10 +171,10 @@ $template_header
 <repositoryName>$setting->{repositoryName}</repositoryName>
 <baseURL>[% request.uri %]</baseURL>
 <protocolVersion>2.0</protocolVersion>
+<adminEmail>$setting->{adminEmail}</adminEmail>
 <earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
 <deletedRecord>$setting->{deletedRecord}</deletedRecord>
 <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
-<adminEmail>$setting->{adminEmail}</adminEmail>
 <description>
     <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -236,8 +236,8 @@ TT
         $template_list_metadata_formats .= <<TT;
 <metadataFormat>
     <metadataPrefix>$format->{metadataPrefix}</metadataPrefix>
-    <metadataNamespace>$format->{metadataNamespace}</metadataNamespace>
     <schema>$format->{schema}</schema>
+    <metadataNamespace>$format->{metadataNamespace}</metadataNamespace>
 </metadataFormat>
 TT
     }
@@ -353,7 +353,7 @@ TT
             return render(\$template_error, $vars);
         }
 
-        content_type 'xml';
+        content_type 'text/xml';
 
         if ($verb eq 'GetRecord') {
             my $id = $params->{identifier};
