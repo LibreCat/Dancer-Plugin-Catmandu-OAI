@@ -18,6 +18,7 @@ my $builder = Module::Build->new(
         'Catmandu' => '0.03',
         'Dancer' => '1.3',
         'DateTime' => 0,
+        'Clone' => 0
     },
     add_to_cleanup => [qw(
         Dancer-Plugin-Catmandu-OAI-*

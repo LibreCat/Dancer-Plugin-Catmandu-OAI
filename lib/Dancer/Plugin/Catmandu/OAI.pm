@@ -6,11 +6,11 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =head1 VERSION
 
-Version 0.0302
+Version 0.0303
 
 =cut
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(:is);
@@ -20,6 +20,7 @@ use Catmandu::Exporter::Template;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
+use Clone qw(clone);
 
 my $DEFAULT_LIMIT = 100;
 
@@ -63,6 +64,14 @@ sub oai_provider {
     my ($path, %opts) = @_;
 
     my $setting = plugin_setting;
+
+    $setting->{granularity} ||= "YYYY-MM-DDThh:mm:ssZ";
+
+    #default search params - start
+
+    my $default_search_params = is_hash_ref($setting->{default_search_params}) ? $setting->{default_search_params} : {};
+    
+    #default search params - end
 
     my $metadata_formats = do {
         my $list = $setting->{metadata_formats};
@@ -169,11 +178,11 @@ TT
 $template_header
 <Identify>
 <repositoryName>$setting->{repositoryName}</repositoryName>
-<baseURL>[% request.uri %]</baseURL>
+<baseURL>[% request_uri %]</baseURL>
 <protocolVersion>2.0</protocolVersion>
 <earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
 <deletedRecord>$setting->{deletedRecord}</deletedRecord>
-<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
+<granularity>$setting->{granularity}</granularity>
 <adminEmail>$setting->{adminEmail}</adminEmail>
 <description>
     <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
@@ -428,8 +437,8 @@ TT
             unless (@cql) {
                 push @cql, "(cql.allRecords)";
             }
-
-            my $search = $bag->search(cql_query => join(' AND ', @cql), limit => $limit, start => $start);
+           
+            my $search = $bag->search(%{clone($default_search_params)},cql_query => join(' AND ', @cql), limit => $limit, start => $start);
             unless ($search->total) {
                 push @$errors, [noRecordsMatch => "no records found"];
                 return render(\$template_error, $vars);
