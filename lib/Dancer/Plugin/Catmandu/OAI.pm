@@ -67,12 +67,8 @@ sub oai_provider {
 
     $setting->{granularity} ||= "YYYY-MM-DDThh:mm:ssZ";
 
-    #default search params - start
-
     my $default_search_params = is_hash_ref($setting->{default_search_params}) ? $setting->{default_search_params} : {};
     
-    #default search params - end
-
     my $metadata_formats = do {
         my $list = $setting->{metadata_formats};
         my $hash = {};
