@@ -6,11 +6,11 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =head1 VERSION
 
-Version 0.0303
+Version 0.0302
 
 =cut
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0302';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(:is);
@@ -268,6 +268,7 @@ TT
 $template_footer
 TT
 
+    my $fix = $opts{fix} || $setting->{fix};
     my $sub_deleted = $opts{deleted} || sub { 0 };
     my $sub_set_specs_for = $opts{set_specs_for} || sub { [] };
 
@@ -363,9 +364,32 @@ TT
         if ($verb eq 'GetRecord') {
             my $id = $params->{identifier};
             $id =~ s/^$ns//;
-            if (my $rec = $bag->get($id)) {
+
+
+            #use 'search' instead of 'get' to apply default_search_params (e.g. fq cannot be applied when using 'get')
+            my $rec = undef;
+            my $res = $bag->search(
+
+                %{clone($default_search_params)},
+                query => "_id:\"$id\"",              
+                start => 0,
+                limit => 1
+
+            );
+            if($res->total){
+              $rec = $res->first;
+            }              
+
+            if ($rec) {
+
+                if ( $fix ) {
+
+                    $rec = Catmandu->fixer($fix)->fix($rec);
+
+                }
+
                 $vars->{id} = $id;
-                $vars->{datestamp} = _combined_utc_datestamp($rec->{$setting->{datestamp_field}});
+                $vars->{datestamp} = $rec->{$setting->{datestamp_field}};
                 $vars->{deleted} = $sub_deleted->($rec);
                 $vars->{setSpec} = $sub_set_specs_for->($rec);
                 my $metadata = "";
@@ -452,9 +476,14 @@ TT
             if ($verb eq 'ListIdentifiers') {
                 $vars->{records} = [map {
                     my $rec = $_;
+                    if($fix){
+
+                        $rec = Catmandu->fixer($fix)->fix($rec);    
+
+                    }
                     {
                         id => $rec->{_id},
-                        datestamp => _combined_utc_datestamp($rec->{$setting->{datestamp_field}}),
+                        datestamp => $rec->{$setting->{datestamp_field}},
                         deleted => $sub_deleted->($rec),
                         setSpec => $sub_set_specs_for->($rec),
                     };
@@ -463,6 +492,13 @@ TT
             } else {
                 $vars->{records} = [map {
                     my $rec = $_;
+
+                    if($fix){
+
+                        $rec = Catmandu->fixer($fix)->fix($rec);
+
+                    }                    
+              
                     my $deleted = $sub_deleted->($rec);
                     my $metadata;
                     unless ($deleted) {
@@ -477,7 +513,7 @@ TT
                     }
                     {
                         id => $rec->{_id},
-                        datestamp => _combined_utc_datestamp($rec->{$setting->{datestamp_field}}),
+                        datestamp => $rec->{$setting->{datestamp_field}},
                         deleted => $deleted,
                         setSpec => $sub_set_specs_for->($rec),
                         metadata => $metadata,
@@ -503,7 +539,7 @@ TT
 };
 
 sub _combined_utc_datestamp {
-    my $date = $_[0];
+    my $date = $_[0];    
     if ($date) {
         $date = "${date}T00:00:00" unless length($date) > 10;
         $date = "${date}:00"       unless length($date) > 16;
