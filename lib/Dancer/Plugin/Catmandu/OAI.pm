@@ -563,6 +563,10 @@ L<Catmandu>
 
 Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>
 
+=head1 CONTRIBUTORS
+
+Nicolas Franck, C<< <nicolas.franck at ugent.be> >>
+
 =head1 LICENSE AND COPYRIGHT
 
 This program is free software; you can redistribute it and/or modify it
