@@ -6,11 +6,11 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =head1 VERSION
 
-Version 0.0302
+Version 0.0303
 
 =cut
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0303';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(:is);
@@ -176,10 +176,10 @@ $template_header
 <repositoryName>$setting->{repositoryName}</repositoryName>
 <baseURL>[% request_uri %]</baseURL>
 <protocolVersion>2.0</protocolVersion>
+<adminEmail>$setting->{adminEmail}</adminEmail>
 <earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
 <deletedRecord>$setting->{deletedRecord}</deletedRecord>
 <granularity>$setting->{granularity}</granularity>
-<adminEmail>$setting->{adminEmail}</adminEmail>
 <description>
     <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -241,8 +241,8 @@ TT
         $template_list_metadata_formats .= <<TT;
 <metadataFormat>
     <metadataPrefix>$format->{metadataPrefix}</metadataPrefix>
-    <metadataNamespace>$format->{metadataNamespace}</metadataNamespace>
     <schema>$format->{schema}</schema>
+    <metadataNamespace>$format->{metadataNamespace}</metadataNamespace>
 </metadataFormat>
 TT
     }
