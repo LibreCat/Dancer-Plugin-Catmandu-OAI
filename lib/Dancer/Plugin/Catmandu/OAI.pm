@@ -20,6 +20,7 @@ use Catmandu::Exporter::Template;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
+use Clone qw(clone);
 
 my $DEFAULT_LIMIT = 100;
 
@@ -64,6 +65,10 @@ sub oai_provider {
 
     my $setting = plugin_setting;
 
+    $setting->{granularity} ||= "YYYY-MM-DDThh:mm:ssZ";
+
+    my $default_search_params = is_hash_ref($setting->{default_search_params}) ? $setting->{default_search_params} : {};
+    
     my $metadata_formats = do {
         my $list = $setting->{metadata_formats};
         my $hash = {};
@@ -169,11 +174,11 @@ TT
 $template_header
 <Identify>
 <repositoryName>$setting->{repositoryName}</repositoryName>
-<baseURL>[% request.uri %]</baseURL>
+<baseURL>[% request_uri %]</baseURL>
 <protocolVersion>2.0</protocolVersion>
 <earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
 <deletedRecord>$setting->{deletedRecord}</deletedRecord>
-<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
+<granularity>$setting->{granularity}</granularity>
 <adminEmail>$setting->{adminEmail}</adminEmail>
 <description>
     <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
@@ -263,6 +268,7 @@ TT
 $template_footer
 TT
 
+    my $fix = $opts{fix} || $setting->{fix};
     my $sub_deleted = $opts{deleted} || sub { 0 };
     my $sub_set_specs_for = $opts{set_specs_for} || sub { [] };
 
@@ -358,9 +364,32 @@ TT
         if ($verb eq 'GetRecord') {
             my $id = $params->{identifier};
             $id =~ s/^$ns//;
-            if (my $rec = $bag->get($id)) {
+
+
+            #use 'search' instead of 'get' to apply default_search_params (e.g. fq cannot be applied when using 'get')
+            my $rec = undef;
+            my $res = $bag->search(
+
+                %{clone($default_search_params)},
+                query => "_id:\"$id\"",              
+                start => 0,
+                limit => 1
+
+            );
+            if($res->total){
+              $rec = $res->first;
+            }              
+
+            if ($rec) {
+
+                if ( $fix ) {
+
+                    $rec = Catmandu->fixer($fix)->fix($rec);
+
+                }
+
                 $vars->{id} = $id;
-                $vars->{datestamp} = _combined_utc_datestamp($rec->{$setting->{datestamp_field}});
+                $vars->{datestamp} = $rec->{$setting->{datestamp_field}};
                 $vars->{deleted} = $sub_deleted->($rec);
                 $vars->{setSpec} = $sub_set_specs_for->($rec);
                 my $metadata = "";
@@ -428,8 +457,8 @@ TT
             unless (@cql) {
                 push @cql, "(cql.allRecords)";
             }
-
-            my $search = $bag->search(cql_query => join(' AND ', @cql), limit => $limit, start => $start);
+           
+            my $search = $bag->search(%{clone($default_search_params)},cql_query => join(' AND ', @cql), limit => $limit, start => $start);
             unless ($search->total) {
                 push @$errors, [noRecordsMatch => "no records found"];
                 return render(\$template_error, $vars);
@@ -447,9 +476,14 @@ TT
             if ($verb eq 'ListIdentifiers') {
                 $vars->{records} = [map {
                     my $rec = $_;
+                    if($fix){
+
+                        $rec = Catmandu->fixer($fix)->fix($rec);    
+
+                    }
                     {
                         id => $rec->{_id},
-                        datestamp => _combined_utc_datestamp($rec->{$setting->{datestamp_field}}),
+                        datestamp => $rec->{$setting->{datestamp_field}},
                         deleted => $sub_deleted->($rec),
                         setSpec => $sub_set_specs_for->($rec),
                     };
@@ -458,6 +492,13 @@ TT
             } else {
                 $vars->{records} = [map {
                     my $rec = $_;
+
+                    if($fix){
+
+                        $rec = Catmandu->fixer($fix)->fix($rec);
+
+                    }                    
+              
                     my $deleted = $sub_deleted->($rec);
                     my $metadata;
                     unless ($deleted) {
@@ -472,7 +513,7 @@ TT
                     }
                     {
                         id => $rec->{_id},
-                        datestamp => _combined_utc_datestamp($rec->{$setting->{datestamp_field}}),
+                        datestamp => $rec->{$setting->{datestamp_field}},
                         deleted => $deleted,
                         setSpec => $sub_set_specs_for->($rec),
                         metadata => $metadata,
@@ -498,7 +539,7 @@ TT
 };
 
 sub _combined_utc_datestamp {
-    my $date = $_[0];
+    my $date = $_[0];    
     if ($date) {
         $date = "${date}T00:00:00" unless length($date) > 10;
         $date = "${date}:00"       unless length($date) > 16;
@@ -521,6 +562,10 @@ L<Catmandu>
 =head1 AUTHOR
 
 Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>
+
+=head1 CONTRIBUTORS
+
+Nicolas Franck, C<< <nicolas.franck at ugent.be> >>
 
 =head1 LICENSE AND COPYRIGHT
 

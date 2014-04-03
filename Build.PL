@@ -7,6 +7,7 @@ my $builder = Module::Build->new(
     license => 'perl',
     dist_author => [
         'Nicolas Steenlant <nicolas.steenlant@ugent.be>',
+        'Nicolas Franck <nicolas.franck@ugent.be>'
     ],
     build_requires => {
         'Software::License' => 0,
@@ -15,9 +16,10 @@ my $builder = Module::Build->new(
     },
     requires => {
         'perl' => '5.10.1',
-        'Catmandu' => '0.03',
-        'Dancer' => '1.3',
+        'Catmandu' => '0.8013',
+        'Dancer' => '1.3121',
         'DateTime' => 0,
+        'Clone' => 0
     },
     add_to_cleanup => [qw(
         Dancer-Plugin-Catmandu-OAI-*
