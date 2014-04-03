@@ -1,5 +1,37 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0302  2014-03-04-2014
+        - "granularity" can be set to these two options in the plugin configuration: 
+
+          - YYYY-MM-DDThh:mm:ssZ
+          - YYYY-MM-DD
+
+        - "fix" can be set in the plugin configuration:
+
+          - this "fix" fixes the input record(s). This is a global fix that is 
+            applied before any action is taken on the record.
+
+            e.g. GetRecord, ListRecords, and ListIdentifiers share this fix
+
+          - This is not the same as the fix, as configured for every metadataPrefix.
+            First of all the global fix is applied, and later the fix for the metadataPrefix is applied.
+
+        - "datestamp" is copied from the fixed record (see above), instead of fixed by "_combined_utc_datestamp". 
+          Fixing the datestamp values is up to the global fix (see: Catmandu::Fix::datetime_format). 
+          One should make sure that the values in this field honor the configured "granularity".
+
+        - "default_search_params" can be set in the plugin configuration:
+
+          these arguments are given to the search method of the Catmandu::Bag.
+          Beware that these are overwritten inline by "start","limit","query" and "cql_query",
+          so those cannot be used.
+
+        - $bag->get is changed by $bag->search in "GetRecord"
+
+          To honor the "default_search_params", the search method of the Catmandu::Bag is used. 
+          These parameters are preset, and cannot be changed by "default_search_params"       
+
+
 0.0302  2013-03-11
        - fix date format in resumptionToken
 
