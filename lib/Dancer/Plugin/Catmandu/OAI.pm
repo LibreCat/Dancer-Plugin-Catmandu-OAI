@@ -6,11 +6,11 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =head1 VERSION
 
-Version 0.0303
+Version 0.0304
 
 =cut
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0304';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(:is);
@@ -67,8 +67,10 @@ sub oai_provider {
 
     $setting->{granularity} ||= "YYYY-MM-DDThh:mm:ssZ";
 
-    my $default_search_params = is_hash_ref($setting->{default_search_params}) ? $setting->{default_search_params} : {};
-    
+    my $default_search_params = is_hash_ref($setting->{default_search_params})
+        ? $setting->{default_search_params}
+        : {};
+
     my $metadata_formats = do {
         my $list = $setting->{metadata_formats};
         my $hash = {};
@@ -336,7 +338,7 @@ TT
                 $params->{from}           = $parts[1];
                 $params->{until}          = $parts[2];
                 $params->{metadataPrefix} = $parts[3];
-                $vars->{start} = $parts[4];
+                $vars->{start}            = $parts[4];
             }
         }
 
@@ -371,21 +373,18 @@ TT
             my $res = $bag->search(
 
                 %{clone($default_search_params)},
-                query => "_id:\"$id\"",              
+                query => "_id:\"$id\"",
                 start => 0,
                 limit => 1
 
             );
-            if($res->total){
-              $rec = $res->first;
-            }              
+            if ($res->total) {
+                $rec = $res->first;
+            }
 
             if ($rec) {
-
-                if ( $fix ) {
-
+                if ($fix) {
                     $rec = Catmandu->fixer($fix)->fix($rec);
-
                 }
 
                 $vars->{id} = $id;
@@ -457,7 +456,7 @@ TT
             unless (@cql) {
                 push @cql, "(cql.allRecords)";
             }
-           
+
             my $search = $bag->search(%{clone($default_search_params)},cql_query => join(' AND ', @cql), limit => $limit, start => $start);
             unless ($search->total) {
                 push @$errors, [noRecordsMatch => "no records found"];
@@ -476,10 +475,8 @@ TT
             if ($verb eq 'ListIdentifiers') {
                 $vars->{records} = [map {
                     my $rec = $_;
-                    if($fix){
-
-                        $rec = Catmandu->fixer($fix)->fix($rec);    
-
+                    if ($fix) {
+                        $rec = Catmandu->fixer($fix)->fix($rec);
                     }
                     {
                         id => $rec->{_id},
@@ -493,12 +490,10 @@ TT
                 $vars->{records} = [map {
                     my $rec = $_;
 
-                    if($fix){
-
+                    if ($fix) {
                         $rec = Catmandu->fixer($fix)->fix($rec);
+                    }
 
-                    }                    
-              
                     my $deleted = $sub_deleted->($rec);
                     my $metadata;
                     unless ($deleted) {
@@ -539,7 +534,7 @@ TT
 };
 
 sub _combined_utc_datestamp {
-    my $date = $_[0];    
+    my $date = $_[0];
     if ($date) {
         $date = "${date}T00:00:00" unless length($date) > 10;
         $date = "${date}:00"       unless length($date) > 16;

@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
     requires => {
         'perl' => '5.10.1',
         'Catmandu' => '0.8013',
+        'Catmandu::Exporter::Template' => 'v0.02',
         'Dancer' => '1.3121',
         'DateTime' => 0,
         'Clone' => 0
