@@ -550,9 +550,66 @@ register_plugin;
 
 1;
 
+=head1 NAME
+
+Dancer::Plugin::Catmandu::OAI - Dancer OAI service provider based on a Catmandu store
+
+=head1 SYNOPSIS
+
+use Dancer::Plugin::Catmandu::SRU;
+
+oai_provider '/oai';
+
+=head1 CONFIGURATION
+
+    plugins:
+        'Catmandu::OAI':
+            store: oai
+            bag: publication
+            datestamp_field: date_updated
+            repositoryName: "My OAI Service Provider" 
+            uri_base: "http://oai.service.com/oai"
+            adminEmail: me@example.com
+            earliestDatestamp: "1970-01-01T00:00:01Z"
+            deletedRecord: persistent
+            repositoryIdentifier: oai.service.com
+            limit: 200
+            delimiter: ":"
+            sampleIdentifier: "oai:oai.service.com:1585315"
+            metadata_formats:
+                -
+                    metadataPrefix: oai_dc
+                    schema: "http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
+                    metadataNamespace: "http://www.openarchives.org/OAI/2.0/oai_dc/"
+                    template: views/oai_dc.tt
+                    filter: 'status exact public'
+                    fix:
+                      - publication_to_dc()
+                -
+                    metadataPrefix: mods
+                    schema: "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd"
+                    metadataNamespace: "http://www.loc.gov/mods/v3"
+                    template: views/mods.tt
+                    filter: 'submissionstatus exact public'
+                    fix:
+                      - publication_to_mods()
+            sets:
+                - 
+                    setSpec: openaire_data
+                    setName: OpenAire_data
+                    cql: 'documenttype exact researchData AND ecfunded=1'
+                -
+                    setSpec: bookChapterFtxt
+                    setName: Book Chapter with fulltext
+                    cql: 'documenttype exact bookChapter AND fulltext exact 1'
+                -
+                    setSpec: bookEditor
+                    setName: Book Editor
+                    cql: 'documenttype exact bookEditor'
+
 =head1 SEE ALSO
 
-L<Catmandu>
+L<Dancer::Plugin::Catmandu::SRU>, L<Catmandu>, L<Catmandu::Store>
 
 =head1 AUTHOR
 
@@ -569,3 +626,5 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
+
+=cut
