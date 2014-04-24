@@ -11,3 +11,5 @@ MANIFEST*
 META.*
 MYMETA.*
 Dancer-Plugin-Catmandu-OAI-*
+/.build
+!META.json
