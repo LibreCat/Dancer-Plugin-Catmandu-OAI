@@ -100,6 +100,8 @@ sub oai_provider {
 
     my $ns = "oai:$setting->{repositoryIdentifier}:";
 
+    my $uri_base = $setting->{uri_base} ||= request->uri_base;
+
     my $branding = "";
     if (my $icon = $setting->{collectionIcon}) {
         if (my $url = $icon->{url}) {
@@ -129,9 +131,9 @@ TT
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
 <responseDate>[% response_date %]</responseDate>
 [%- IF params.resumptionToken %]
-<request verb="[% params.verb %]" resumptionToken="[% params.resumptionToken %]">[% request_uri | xml %]</request>
+<request verb="[% params.verb %]" resumptionToken="[% params.resumptionToken %]">$uri_base</request>
 [%- ELSE %]
-<request[% FOREACH param IN params %] [% param.key %]="[% param.value | xml %]"[% END %]>[% request_uri | xml %]</request>
+<request[% FOREACH param IN params %] [% param.key %]="[% param.value | xml %]"[% END %]>$uri_base</request>
 [%- END %]
 TT
 
@@ -176,7 +178,7 @@ TT
 $template_header
 <Identify>
 <repositoryName>$setting->{repositoryName}</repositoryName>
-<baseURL>[% request_uri %]</baseURL>
+<baseURL>$uri_base</baseURL>
 <protocolVersion>2.0</protocolVersion>
 <adminEmail>$setting->{adminEmail}</adminEmail>
 <earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
@@ -284,7 +286,7 @@ TT
         my $set;
         my $verb = $params->{verb};
         my $vars = {
-            request_uri => request->uri_for($path),
+            request_uri => $uri_base . $path,
             response_date => $response_date,
             errors => $errors,
         };
@@ -550,10 +552,6 @@ register_plugin;
 
 1;
 
-=head1 NAME
-
-Dancer::Plugin::Catmandu::OAI - Dancer OAI service provider based on a Catmandu store
-
 =head1 SYNOPSIS
 
 use Dancer::Plugin::Catmandu::SRU;
@@ -595,17 +593,17 @@ oai_provider '/oai';
                       - publication_to_mods()
             sets:
                 - 
-                    setSpec: openaire_data
-                    setName: OpenAire_data
-                    cql: 'documenttype exact researchData AND ecfunded=1'
+                    setSpec: openaccess
+                    setName: Open Access
+                    cql: 'oa=1'
                 -
-                    setSpec: bookChapterFtxt
-                    setName: Book Chapter with fulltext
-                    cql: 'documenttype exact bookChapter AND fulltext exact 1'
+                    setSpec: journal_article
+                    setName: Journal article
+                    cql: 'documenttype exact journal_article'
                 -
-                    setSpec: bookEditor
-                    setName: Book Editor
-                    cql: 'documenttype exact bookEditor'
+                    setSpec: book
+                    setName: Book
+                    cql: 'documenttype exact book'
 
 =head1 SEE ALSO
 
@@ -618,6 +616,7 @@ Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>
 =head1 CONTRIBUTORS
 
 Nicolas Franck, C<< <nicolas.franck at ugent.be> >>
+Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>
 
 =head1 LICENSE AND COPYRIGHT
 
