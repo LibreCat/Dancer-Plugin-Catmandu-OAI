@@ -100,6 +100,8 @@ sub oai_provider {
 
     my $ns = "oai:$setting->{repositoryIdentifier}:";
 
+    my $uri_base = $setting->{uri_base} ||= request->uri_base;
+
     my $branding = "";
     if (my $icon = $setting->{collectionIcon}) {
         if (my $url = $icon->{url}) {
@@ -129,9 +131,9 @@ TT
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
 <responseDate>[% response_date %]</responseDate>
 [%- IF params.resumptionToken %]
-<request verb="[% params.verb %]" resumptionToken="[% params.resumptionToken %]">[% request_uri | xml %]</request>
+<request verb="[% params.verb %]" resumptionToken="[% params.resumptionToken %]">$uri_base</request>
 [%- ELSE %]
-<request[% FOREACH param IN params %] [% param.key %]="[% param.value | xml %]"[% END %]>[% request_uri | xml %]</request>
+<request[% FOREACH param IN params %] [% param.key %]="[% param.value | xml %]"[% END %]>$uri_base</request>
 [%- END %]
 TT
 
@@ -176,7 +178,7 @@ TT
 $template_header
 <Identify>
 <repositoryName>$setting->{repositoryName}</repositoryName>
-<baseURL>[% request_uri %]</baseURL>
+<baseURL>$uri_base</baseURL>
 <protocolVersion>2.0</protocolVersion>
 <adminEmail>$setting->{adminEmail}</adminEmail>
 <earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
@@ -284,7 +286,7 @@ TT
         my $set;
         my $verb = $params->{verb};
         my $vars = {
-            request_uri => request->uri_for($path),
+            request_uri => $uri_base . $path,
             response_date => $response_date,
             errors => $errors,
         };
@@ -550,9 +552,64 @@ register_plugin;
 
 1;
 
+=head1 SYNOPSIS
+
+    use Dancer;
+    use Dancer::Plugin::Catmandu::SRU;
+
+    oai_provider '/oai';
+
+
+=head1 CONFIGURATION
+
+    plugins:
+        'Catmandu::OAI':
+            store: oai
+            bag: publication
+            datestamp_field: date_updated
+            repositoryName: "My OAI Service Provider" 
+            uri_base: "http://oai.service.com/oai"
+            adminEmail: me@example.com
+            earliestDatestamp: "1970-01-01T00:00:01Z"
+            deletedRecord: persistent
+            repositoryIdentifier: oai.service.com
+            limit: 200
+            delimiter: ":"
+            sampleIdentifier: "oai:oai.service.com:1585315"
+            metadata_formats:
+                -
+                    metadataPrefix: oai_dc
+                    schema: "http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
+                    metadataNamespace: "http://www.openarchives.org/OAI/2.0/oai_dc/"
+                    template: views/oai_dc.tt
+                    filter: 'status exact public'
+                    fix:
+                      - publication_to_dc()
+                -
+                    metadataPrefix: mods
+                    schema: "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd"
+                    metadataNamespace: "http://www.loc.gov/mods/v3"
+                    template: views/mods.tt
+                    filter: 'submissionstatus exact public'
+                    fix:
+                      - publication_to_mods()
+            sets:
+                - 
+                    setSpec: openaccess
+                    setName: Open Access
+                    cql: 'oa=1'
+                -
+                    setSpec: journal_article
+                    setName: Journal article
+                    cql: 'documenttype exact journal_article'
+                -
+                    setSpec: book
+                    setName: Book
+                    cql: 'documenttype exact book'
+
 =head1 SEE ALSO
 
-L<Catmandu>
+L<Dancer::Plugin::Catmandu::SRU>, L<Catmandu>, L<Catmandu::Store>
 
 =head1 AUTHOR
 
@@ -562,10 +619,10 @@ Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>
 
 Nicolas Franck, C<< <nicolas.franck at ugent.be> >>
 
-=head1 LICENSE AND COPYRIGHT
+Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+=head1 LICENSE
 
-See http://dev.perl.org/licenses/ for more information.
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
