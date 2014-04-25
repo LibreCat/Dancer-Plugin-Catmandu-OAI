@@ -1,5 +1,9 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+{{$NEXT}}
+    - 
+
+
 0.0304  2014-04-22
 
       - add missing dependency on Catmandu:Exporter::Template
