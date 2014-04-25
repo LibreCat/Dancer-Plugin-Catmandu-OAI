@@ -36,7 +36,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Catmandu" : "0.814",
+            "Catmandu" : "0.8014",
             "Catmandu::Exporter::Template" : "0.03",
             "Clone" : "0.36",
             "Dancer" : "1.3123",

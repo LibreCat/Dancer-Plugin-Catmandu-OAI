@@ -8,9 +8,12 @@ Version 0.0304
 
 # SYNOPSIS
 
-use Dancer::Plugin::Catmandu::SRU;
+    use Dancer;
+    use Dancer::Plugin::Catmandu::SRU;
 
-oai\_provider '/oai';
+    oai_provider '/oai';
+
+
 
 # CONFIGURATION
 
@@ -70,12 +73,9 @@ Nicolas Steenlant, `<nicolas.steenlant at ugent.be>`
 # CONTRIBUTORS
 
 Nicolas Franck, `<nicolas.franck at ugent.be>`
+
 Vitali Peil, `<vitali.peil at uni-bielefeld.de>`
 
-# LICENSE AND COPYRIGHT
+# LICENSE
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

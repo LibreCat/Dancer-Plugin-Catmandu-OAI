@@ -554,9 +554,11 @@ register_plugin;
 
 =head1 SYNOPSIS
 
-use Dancer::Plugin::Catmandu::SRU;
+    use Dancer;
+    use Dancer::Plugin::Catmandu::SRU;
 
-oai_provider '/oai';
+    oai_provider '/oai';
+
 
 =head1 CONFIGURATION
 
@@ -616,14 +618,11 @@ Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>
 =head1 CONTRIBUTORS
 
 Nicolas Franck, C<< <nicolas.franck at ugent.be> >>
+
 Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

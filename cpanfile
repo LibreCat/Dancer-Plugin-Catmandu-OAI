@@ -6,7 +6,7 @@ on test => sub {
 };
 
 requires 'Dancer', '1.3123';
-requires 'Catmandu', '>=0.814';
+requires 'Catmandu', '>=0.8014';
 requires 'Catmandu::Exporter::Template', '0.03';
 requires 'DateTime', '1.08';
 requires 'Clone', '0.36';
