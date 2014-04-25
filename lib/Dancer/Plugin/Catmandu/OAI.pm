@@ -369,11 +369,9 @@ TT
             my $id = $params->{identifier};
             $id =~ s/^$ns//;
 
-
             #use 'search' instead of 'get' to apply default_search_params (e.g. fq cannot be applied when using 'get')
             my $rec = undef;
             my $res = $bag->search(
-
                 %{clone($default_search_params)},
                 query => "_id:\"$id\"",
                 start => 0,
@@ -594,7 +592,7 @@ register_plugin;
                     fix:
                       - publication_to_mods()
             sets:
-                - 
+                -
                     setSpec: openaccess
                     setName: Open Access
                     cql: 'oa=1'
