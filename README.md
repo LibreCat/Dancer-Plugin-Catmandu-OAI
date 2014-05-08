@@ -2,10 +2,6 @@
 
 Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu::Store
 
-# VERSION
-
-Version 0.0304
-
 # SYNOPSIS
 
     use Dancer;
@@ -20,7 +16,7 @@ Version 0.0304
             store: oai
             bag: publication
             datestamp_field: date_updated
-            datestamp_pattern: "%Y:%H:%M %H:%M:%S"
+            datestamp_pattern: "%Y-%H-%M %H:%M:%S"
             repositoryName: "My OAI Service Provider"
             uri_base: "http://oai.service.com/oai"
             adminEmail: me@example.com

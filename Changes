@@ -1,10 +1,15 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+
+0.0305  2014-05-08 12:02:22 CEST
+    - make datestamp pattern configurable
     - make uri_base configurable
     - building with Dist::Milla
     - test added
     - docs
+    - default search params
+    - GetRecord is now a cql search
 
 0.0304  2014-04-22
 
