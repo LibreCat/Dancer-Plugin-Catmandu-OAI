@@ -4,10 +4,6 @@ package Dancer::Plugin::Catmandu::OAI; # TODO hierarchical sets, setDescription
 
 Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu::Store
 
-=head1 VERSION
-
-Version 0.0304
-
 =cut
 
 our $VERSION = '0.0304';
