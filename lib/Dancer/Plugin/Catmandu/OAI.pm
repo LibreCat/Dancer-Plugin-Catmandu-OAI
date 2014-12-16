@@ -472,9 +472,9 @@ TT
                 $cql_until = DateTime::Format::Strptime::strftime($pattern, parse_oai_datestamp($cql_until)) if $cql_until;
             }
 
-            push @cql, qq|($setting->{cql_filter})|                      if $setting->{cql_filter};
-            push @cql, qq|($set->{cql})|                                 if $set && $set->{cql};
-            push @cql, qq|($setting->{datestamp_field} >= "$cql_from")|  if $cql_from;
+            push @cql, qq|($format->{cql})| if $format->{cql};
+            push @cql, qq|($set->{cql})| if $set && $set->{cql};
+            push @cql, qq|($setting->{datestamp_field} >= "$cql_from")| if $cql_from;
             push @cql, qq|($setting->{datestamp_field} <= "$cql_until")| if $cql_until;
             unless (@cql) {
                 push @cql, "(cql.allRecords)";
@@ -595,7 +595,6 @@ register_plugin;
             limit: 200
             delimiter: ":"
             sampleIdentifier: "oai:oai.service.com:1585315"
-            cql_filter: 'status exact public'
             get_record_cql_pattern: 'id exact "%s"'
             metadata_formats:
                 -
@@ -603,6 +602,7 @@ register_plugin;
                     schema: "http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
                     metadataNamespace: "http://www.openarchives.org/OAI/2.0/oai_dc/"
                     template: views/oai_dc.tt
+                    cql: 'status exact public OR status exact deleted'
                     fix:
                       - publication_to_dc()
                 -
@@ -610,7 +610,7 @@ register_plugin;
                     schema: "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd"
                     metadataNamespace: "http://www.loc.gov/mods/v3"
                     template: views/mods.tt
-                    filter: 'submissionstatus exact public'
+                    cql: 'status exact public'
                     fix:
                       - publication_to_mods()
             sets:
