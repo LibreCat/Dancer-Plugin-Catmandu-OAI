@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 use strict;
 use warnings;
 use Test::More import => ['!pass'];
@@ -21,6 +19,13 @@ response_content_like [GET => '/oai'], qr/illegal OAI verb/,
 
 my $res;
 $res = dancer_response("GET", '/oai', {params => {verb => "Identify" }});
-like $res->{content}, qr/request verb="Identify"/, "Identify ok";
+like $res->{content}, qr/request verb="Identify"/, "Identify";
 
-done_testing 5;
+$res = dancer_response("GET", '/oai', {params =>
+	{verb => "ListMetadataFormats"}});
+like $res->{content}, qr/request verb="ListMetadataFormats"/, "ListMetadataFormats";
+
+$res = dancer_response("GET", '/oai', {params => {verb => "ListSets"}});
+like $res->{content}, qr/setSpec>journal_article<\/setSpec/, "ListSets";
+
+done_testing;
