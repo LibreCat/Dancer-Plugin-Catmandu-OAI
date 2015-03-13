@@ -34,6 +34,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
                     schema: "http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
                     metadataNamespace: "http://www.openarchives.org/OAI/2.0/oai_dc/"
                     template: views/oai_dc.tt
+                    cql: 'status exact public OR status exact deleted'
                     fix:
                       - publication_to_dc()
                 -
@@ -41,7 +42,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
                     schema: "http://www.loc.gov/standards/mods/v3/mods-3-0.xsd"
                     metadataNamespace: "http://www.loc.gov/mods/v3"
                     template: views/mods.tt
-                    filter: 'submissionstatus exact public'
+                    cql: 'status exact public'
                     fix:
                       - publication_to_mods()
             sets:

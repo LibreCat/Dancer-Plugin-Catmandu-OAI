@@ -472,6 +472,7 @@ TT
                 $cql_until = DateTime::Format::Strptime::strftime($pattern, parse_oai_datestamp($cql_until)) if $cql_until;
             }
 
+            push @cql, qq|($setting->{cql_filter})| if $setting->{cql_filter};
             push @cql, qq|($format->{cql})| if $format->{cql};
             push @cql, qq|($set->{cql})| if $set && $set->{cql};
             push @cql, qq|($setting->{datestamp_field} >= "$cql_from")| if $cql_from;
@@ -595,6 +596,7 @@ register_plugin;
             limit: 200
             delimiter: ":"
             sampleIdentifier: "oai:oai.service.com:1585315"
+            cql_filter: 'status exact public'
             get_record_cql_pattern: 'id exact "%s"'
             metadata_formats:
                 -
