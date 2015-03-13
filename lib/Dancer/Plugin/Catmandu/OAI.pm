@@ -79,6 +79,7 @@ sub oai_provider {
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
     $setting->{get_record_cql_pattern} //= '_id exact "%s"';
 
+    # TODO this was for backwards compatibility. Remove?
     if ($setting->{filter}) {
         $setting->{cql_filter} = delete $setting->{filter};
     }
