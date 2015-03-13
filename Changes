@@ -2,6 +2,9 @@ Revision history for Dancer-Plugin-Catmandu-OAI
 
 
 {{$NEXT}}
+    - metadata_formats cql option
+    - fix pod
+    - more tests
 
 0.0305  2014-05-08 12:11:15 CEST
     - make datestamp pattern configurable
