@@ -64,6 +64,7 @@ sub parse_oai_datestamp {
 
 sub render {
     my ($tmpl, $data) = @_;
+    content_type 'xml';
     my $out = "";
     my $exporter = Catmandu::Exporter::Template->new(template => $tmpl, file => \$out);
     $exporter->add($data);
@@ -392,7 +393,6 @@ TT
             return render(\$template_error, $vars);
         }
 
-        content_type 'xml';
 
         if ($verb eq 'GetRecord') {
             my $id = $params->{identifier};
