@@ -2,9 +2,7 @@ Revision history for Dancer-Plugin-Catmandu-OAI
 
 
 {{$NEXT}}
-
-0.0307  2015-07-02
-    - put function call "content_type 'xml'" in function "render". Now errors also have content-type application/xml
+  - put function call "content_type 'xml'" in function "render". Now errors also have content-type application/xml
 
 0.0306  2015-03-13 09:52:27 CET
     - metadata_formats cql option
