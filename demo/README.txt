@@ -1,7 +1,6 @@
 Setup a demo OAI server
 -=-=-=-=-=-=-=-=-=-=-=-
 
-
 Setup an ElasticSearch server
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 * Download ElasticSearch from https://www.elastic.co/downloads/elasticsearch

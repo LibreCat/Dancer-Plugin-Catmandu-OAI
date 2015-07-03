@@ -579,6 +579,11 @@ register_plugin;
 
     oai_provider '/oai';
 
+=head1 DEMO
+
+In the C<demo/> directory of this distribution complete example setup for an OAI repository using
+L<Catmandu::Store::ElasticSearch> is available.
+Futher documentation is available in the LibreCat blog: L<https://librecatproject.wordpress.com/2014/12/18/day-14-set-up-your-own-oai-data-service/>
 
 =head1 CONFIGURATION
 
@@ -643,6 +648,8 @@ Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>
 Nicolas Franck, C<< <nicolas.franck at ugent.be> >>
 
 Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>
+
+Patrick Hochstenbach, C<< <patric.hochstenbach at ugent.be> >>
 
 =head1 LICENSE
 
