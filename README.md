@@ -9,6 +9,12 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
     oai_provider '/oai';
 
+# DEMO
+
+In the `demo/` directory of this distribution complete example setup for an OAI repository using
+[Catmandu::Store::ElasticSearch](https://metacpan.org/pod/Catmandu::Store::ElasticSearch) is available.
+Futher documentation is available in the LibreCat blog: [https://librecatproject.wordpress.com/2014/12/18/day-14-set-up-your-own-oai-data-service/](https://librecatproject.wordpress.com/2014/12/18/day-14-set-up-your-own-oai-data-service/)
+
 # CONFIGURATION
 
     plugins:
@@ -72,6 +78,8 @@ Nicolas Steenlant, `<nicolas.steenlant at ugent.be>`
 Nicolas Franck, `<nicolas.franck at ugent.be>`
 
 Vitali Peil, `<vitali.peil at uni-bielefeld.de>`
+
+Patrick Hochstenbach, `<patric.hochstenbach at ugent.be>`
 
 # LICENSE
 

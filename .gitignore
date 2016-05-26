@@ -11,4 +11,7 @@ META.*
 MYMETA.*
 Dancer-Plugin-Catmandu-OAI-*
 /.build
+demo/logs
 !META.json
+cpanfile.snapshot
+local

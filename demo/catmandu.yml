@@ -16,14 +16,6 @@ store:
                   '=': true
                   'exact': true
                 field: '_id'
-              basic:
-                op:
-                  'any': true
-                  'all': true
-                  '=': true
-                  '<>': true
-                field: '_all'
-                description: "index with common fields..."
               datestamp:
                 op:
                   '=': true
@@ -32,8 +24,15 @@ store:
                   '>=': true
                   '>': true
                   'exact': true
-                field: '_datestamp'
+                field: 'datestamp'
+              set:
+                op:
+                  'any': true
+                  'all': true
+                  '=': true
+                  'exact': true
+                field: 'setSpec'
       index_mappings:
         publication:
           properties:
-            _datestamp: {type: date, format: date_time_no_millis}
+            datestamp: {type: date, format: date_time_no_millis}
