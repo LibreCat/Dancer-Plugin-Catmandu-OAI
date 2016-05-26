@@ -95,7 +95,7 @@ for identifiers and datastamps in the ElasticSearch collection:
 
 # IMPORT RECORDS
 
-With the Catmandu configuration in place records can be importer with the [catmandu](https://metacpan.org/pod/catmandu) command:
+With the Catmandu configuration files in place records can be imported with the [catmandu](https://metacpan.org/pod/catmandu) command:
 
     # Drop the existing ElasticSearch 'oai' collection
     $ catmandu drop oai
@@ -137,6 +137,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
 Below is a sample minimal configuration for the 'sample.yml' demo above:
 
     $ cat config.yml
+    charset: "UTF-8"
     plugins:
       'Catmandu::OAI':
         store: oai
@@ -146,6 +147,7 @@ Below is a sample minimal configuration for the 'sample.yml' demo above:
         uri_base: "http://oai.service.com/oai"
         adminEmail: me@example.com
         earliestDatestamp: "1970-01-01T00:00:01Z"
+        cql_filter: "datestamp>1970-01-01T00:00:01Z"
         deletedRecord: persistent
         repositoryIdentifier: oai.service.com
         limit: 200
