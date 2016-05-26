@@ -662,7 +662,7 @@ for identifiers and datastamps in the ElasticSearch collection:
 
 =head1 IMPORT RECORDS
 
-With the Catmandu configuration in place records can be importer with the L<catmandu> command:
+With the Catmandu configuration files in place records can be imported with the L<catmandu> command:
 
     # Drop the existing ElasticSearch 'oai' collection
     $ catmandu drop oai
