@@ -1,3 +1,4 @@
+charset: "UTF-8"
 plugins:
   'Catmandu::OAI':
     store: oai
@@ -7,9 +8,9 @@ plugins:
     uri_base: "http://oai.service.com/oai"
     adminEmail: me@example.com
     earliestDatestamp: "1970-01-01T00:00:01Z"
+    cql_filter: "datestamp>1970-01-01T00:00:01Z"
     deletedRecord: persistent
     repositoryIdentifier: oai.service.com
-    cql_filter: "datestamp>2014-12-01T00:00:00Z"
     limit: 200
     delimiter: ":"
     sampleIdentifier: "oai:oai.service.com:1585315"
@@ -18,11 +19,11 @@ plugins:
         metadataPrefix: oai_dc
         schema: "http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
         metadataNamespace: "http://www.openarchives.org/OAI/2.0/oai_dc/"
-        template: demo.tt
-        fix:
-          - nothing()
+        template: oai_dc.tt
+        fix: 
+            - upcase(title.*)
     sets:
       -
-        setSpec: openaccess
-        setName: Open Access
-        cql: 'oa=1'
+        setSpec: test
+        setName: My Demo Set
+        cql: "set = test"
