@@ -714,6 +714,7 @@ Below is a sample minimal configuration for the 'sample.yml' demo above:
         uri_base: "http://oai.service.com/oai"
         adminEmail: me@example.com
         earliestDatestamp: "1970-01-01T00:00:01Z"
+        cql_filter: "datestamp>1970-01-01T00:00:01Z"
         deletedRecord: persistent
         repositoryIdentifier: oai.service.com
         limit: 200
