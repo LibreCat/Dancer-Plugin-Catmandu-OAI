@@ -1,3 +1,4 @@
+charset: "UTF-8"
 plugins:
   'Catmandu::OAI':
     store: oai

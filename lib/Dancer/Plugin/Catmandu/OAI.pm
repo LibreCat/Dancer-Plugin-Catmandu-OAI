@@ -17,7 +17,6 @@ use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
 use DateTime::Format::Strptime;
-use utf8;
 use Clone qw(clone);
 
 my $DEFAULT_LIMIT = 100;
@@ -70,7 +69,6 @@ sub render {
     my $exporter = Catmandu::Exporter::Template->new(template => $tmpl, file => \$out);
     $exporter->add($data);
     $exporter->commit;
-    utf8::encode($out);
     $out;
 }
 
@@ -706,6 +704,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
 Below is a sample minimal configuration for the 'sample.yml' demo above:
 
     $ cat config.yml
+    charset: "UTF-8"
     plugins:
       'Catmandu::OAI':
         store: oai
