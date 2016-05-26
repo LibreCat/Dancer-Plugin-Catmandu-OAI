@@ -17,6 +17,7 @@ use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
 use DateTime::Format::Strptime;
+use utf8;
 use Clone qw(clone);
 
 my $DEFAULT_LIMIT = 100;
@@ -69,6 +70,7 @@ sub render {
     my $exporter = Catmandu::Exporter::Template->new(template => $tmpl, file => \$out);
     $exporter->add($data);
     $exporter->commit;
+    utf8::encode($out);
     $out;
 }
 

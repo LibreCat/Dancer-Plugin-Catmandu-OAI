@@ -19,6 +19,8 @@ plugins:
         schema: "http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
         metadataNamespace: "http://www.openarchives.org/OAI/2.0/oai_dc/"
         template: oai_dc.tt
+        fix: 
+            - upcase(title.*)
     sets:
       -
         setSpec: test
