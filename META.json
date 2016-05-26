@@ -4,7 +4,7 @@
       "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.047, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -15,12 +15,12 @@
    "name" : "Dancer-Plugin-Catmandu-OAI",
    "no_index" : {
       "directory" : [
-         "eg",
-         "examples",
+         "t",
+         "xt",
          "inc",
          "share",
-         "t",
-         "xt"
+         "eg",
+         "examples"
       ]
    },
    "prereqs" : {
