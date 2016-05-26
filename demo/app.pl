@@ -5,7 +5,6 @@ use Catmandu;
 use Dancer::Plugin::Catmandu::OAI;
  
 Catmandu->load;
-Catmandu->config;
  
 my $options = {};
 

@@ -107,6 +107,9 @@ sub oai_provider {
         for my $format (@$list) {
             my $prefix = $format->{metadataPrefix};
             $format = {%$format};
+            if (my $fix = $format->{fix}) {
+                $format->{fix} = Catmandu::Fix->new(fixes => $fix);
+            }
             $hash->{$prefix} = $format;
         }
         $hash;
@@ -298,6 +301,9 @@ $template_footer
 TT
 
     my $fix = $opts{fix} || $setting->{fix};
+    if ($fix) {
+        $fix = Catmandu::Fix->new(fixes => $fix);
+    }
     my $sub_deleted = $opts{deleted} || sub { 0 };
     my $sub_set_specs_for = $opts{set_specs_for} || sub { [] };
 
@@ -405,7 +411,7 @@ TT
 
             if (defined $rec) {
                 if ($fix) {
-                    $rec = Catmandu->fixer($fix)->fix($rec);
+                    $rec = $fix->fix($rec);
                 }
 
                 $vars->{id} = $id;
@@ -416,8 +422,10 @@ TT
                 my $exporter = Catmandu::Exporter::Template->new(
                     template => $format->{template},
                     file => \$metadata,
-                    fix => $format->{fix},
                 );
+                if ($format->{fix}) {
+                    $rec = $format->{fix}->fix($rec);
+                }
                 $exporter->add($rec);
                 $exporter->commit;
                 $vars->{metadata} = $metadata;
@@ -506,7 +514,7 @@ TT
                 $vars->{records} = [map {
                     my $rec = $_;
                     if ($fix) {
-                        $rec = Catmandu->fixer($fix)->fix($rec);
+                        $rec = $fix->fix($rec);
                     }
                     {
                         id        => $rec->{_id},
@@ -521,7 +529,7 @@ TT
                     my $rec = $_;
 
                     if ($fix) {
-                        $rec = Catmandu->fixer($fix)->fix($rec);
+                        $rec = $fix->fix($rec);
                     }
 
                     my $deleted = $sub_deleted->($rec);
@@ -531,8 +539,10 @@ TT
                         my $exporter = Catmandu::Exporter::Template->new(
                             template => $format->{template},
                             file     => \$metadata,
-                            fix      => $format->{fix},
                         );
+                        if ($format->{fix}) {
+                            $rec = $format->{fix}->fix($rec);
+                        }
                         $exporter->add($rec);
                         $exporter->commit;
                     }

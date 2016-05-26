@@ -29,7 +29,7 @@ Start the Dancer application
 
   $ perl ./app.pl
 
-* An OAI server is now running on port 3000. 
+* An OAI server is now running on port 3000.
 
 * Test queries:
 
