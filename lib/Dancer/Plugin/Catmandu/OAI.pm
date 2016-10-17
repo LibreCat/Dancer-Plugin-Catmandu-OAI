@@ -467,7 +467,7 @@ TT
                 $from = "${from}T00:00:00Z";
             }
             if ($until && length($until) == 10) {
-                $until = "${until}T00:00:00Z";
+                $until = "${until}T23:59:59Z";
             }
 
             my @cql;
@@ -634,7 +634,7 @@ mandatory OAI-DC format. At a minimum each record contains an identifier '_id' a
 
 =head1 CATMANDU CONFIGURATION
 
-ElasticSearch requires a configuration file to map record fields to CQL terms. Below is a minimal configuration required to query 
+ElasticSearch requires a configuration file to map record fields to CQL terms. Below is a minimal configuration required to query
 for identifiers and datastamps in the ElasticSearch collection:
 
     $ cat catmandu.yml
@@ -740,7 +740,7 @@ Below is a sample minimal configuration for the 'sample.yml' demo above:
 =head1 METADATAPREFIX TEMPLATE
 
 For each metadataPrefix a Template Toolkit file needs to exist which translate L<Catmandu::Store> records into XML records. At least
-one Template Toolkit file should be made available to transform stored records into Dublin Core. The example below contains an example file to 
+one Template Toolkit file should be made available to transform stored records into Dublin Core. The example below contains an example file to
 transform 'sample.yml' type records into Dublin Core:
 
     $ cat oai_dc.tt
@@ -760,7 +760,7 @@ transform 'sample.yml' type records into Dublin Core:
 
 If all the required files are available, then a Dancer application can be started. See the 'demo' directory of this distribution for a complete example:
 
-    $ ls 
+    $ ls
     app.pl  catmandu.yml  config.yml  oai_dc.tt
     $ cat app.pl
     #!/usr/bin/env perl
@@ -780,7 +780,7 @@ If all the required files are available, then a Dancer application can be starte
 
     # Start Dancer
     $ perl ./app.pl
-  
+
     # Test queries:
 
     $ curl "http://localhost:3000/oai?verb=Identify"
