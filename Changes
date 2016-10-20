@@ -2,6 +2,8 @@ Revision history for Dancer-Plugin-Catmandu-OAI
 
 
 {{$NEXT}}
+
+0.0309  2016-10-20 10:04:28 CEST
   - fix date bug
 
 0.0308  2016-05-26 14:08:53 CEST

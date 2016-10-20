@@ -57,7 +57,7 @@ mandatory OAI-DC format. At a minimum each record contains an identifier '\_id' 
 
 # CATMANDU CONFIGURATION
 
-ElasticSearch requires a configuration file to map record fields to CQL terms. Below is a minimal configuration required to query 
+ElasticSearch requires a configuration file to map record fields to CQL terms. Below is a minimal configuration required to query
 for identifiers and datastamps in the ElasticSearch collection:
 
     $ cat catmandu.yml
@@ -163,7 +163,7 @@ Below is a sample minimal configuration for the 'sample.yml' demo above:
 # METADATAPREFIX TEMPLATE
 
 For each metadataPrefix a Template Toolkit file needs to exist which translate [Catmandu::Store](https://metacpan.org/pod/Catmandu::Store) records into XML records. At least
-one Template Toolkit file should be made available to transform stored records into Dublin Core. The example below contains an example file to 
+one Template Toolkit file should be made available to transform stored records into Dublin Core. The example below contains an example file to
 transform 'sample.yml' type records into Dublin Core:
 
     $ cat oai_dc.tt
@@ -183,34 +183,34 @@ transform 'sample.yml' type records into Dublin Core:
 
 If all the required files are available, then a Dancer application can be started. See the 'demo' directory of this distribution for a complete example:
 
-      $ ls 
-      app.pl  catmandu.yml  config.yml  oai_dc.tt
-      $ cat app.pl
-      #!/usr/bin/env perl
+    $ ls
+    app.pl  catmandu.yml  config.yml  oai_dc.tt
+    $ cat app.pl
+    #!/usr/bin/env perl
 
-      use Dancer;
-      use Catmandu;
-      use Dancer::Plugin::Catmandu::OAI;
+    use Dancer;
+    use Catmandu;
+    use Dancer::Plugin::Catmandu::OAI;
 
-      Catmandu->load;
-      Catmandu->config;
+    Catmandu->load;
+    Catmandu->config;
 
-      my $options = {};
+    my $options = {};
 
-      oai_provider '/oai' , %$options;
+    oai_provider '/oai' , %$options;
 
-      dance;
+    dance;
 
-      # Start Dancer
-      $ perl ./app.pl
-    
-      # Test queries:
+    # Start Dancer
+    $ perl ./app.pl
 
-      $ curl "http://localhost:3000/oai?verb=Identify"
-      $ curl "http://localhost:3000/oai?verb=ListSets"
-      $ curl "http://localhost:3000/oai?verb=ListMetadataFormats"
-      $ curl "http://localhost:3000/oai?verb=ListIdentifiers&metadataPrefix=oai_dc"
-      $ curl "http://localhost:3000/oai?verb=ListRecords&metadataPrefix=oai_dc"
+    # Test queries:
+
+    $ curl "http://localhost:3000/oai?verb=Identify"
+    $ curl "http://localhost:3000/oai?verb=ListSets"
+    $ curl "http://localhost:3000/oai?verb=ListMetadataFormats"
+    $ curl "http://localhost:3000/oai?verb=ListIdentifiers&metadataPrefix=oai_dc"
+    $ curl "http://localhost:3000/oai?verb=ListRecords&metadataPrefix=oai_dc"
 
 # SEE ALSO
 
