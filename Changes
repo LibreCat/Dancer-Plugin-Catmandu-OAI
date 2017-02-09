@@ -2,6 +2,7 @@ Revision history for Dancer-Plugin-Catmandu-OAI
 
 
 {{$NEXT}}
+  - fix bug in ListRecords if metatadata format has fixes
 
 0.0309  2016-10-20 10:04:28 CEST
   - fix date bug

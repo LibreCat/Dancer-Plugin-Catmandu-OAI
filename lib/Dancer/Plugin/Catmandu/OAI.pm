@@ -533,9 +533,14 @@ TT
                     }
 
                     my $deleted = $sub_deleted->($rec);
-                    my $metadata;
+                    my $rec_vars = {
+                        id        => $rec->{_id},
+                        datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
+                        deleted   => $deleted,
+                        setSpec   => $sub_set_specs_for->($rec),
+                    };
                     unless ($deleted) {
-                        $metadata = "";
+                        my $metadata = "";
                         my $exporter = Catmandu::Exporter::Template->new(
                             template => $format->{template},
                             file     => \$metadata,
@@ -545,14 +550,9 @@ TT
                         }
                         $exporter->add($rec);
                         $exporter->commit;
+                        $rec_vars->{metadata} = $metadata;
                     }
-                    {
-                        id        => $rec->{_id},
-                        datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
-                        deleted   => $deleted,
-                        setSpec   => $sub_set_specs_for->($rec),
-                        metadata  => $metadata,
-                    };
+                    $rec_vars;
                 } @{$search->hits}];
                 return render(\$template_list_records, $vars);
             }
