@@ -111,7 +111,7 @@ With the Catmandu configuration files in place records can be imported with the 
 The Dancer configuration file 'config.yml' contains basic information for the OAI-PMH plugin to work:
 
     * store - In which Catmandu::Store are the metadata records stored
-    * bag   - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
+    * bag - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
     * datestamp_field - Which field in the record contains a datestamp ('datestamp' in our example above)
     * repositoryName - The name of the repository
     * uri_base - The base URL of the repository
@@ -133,6 +133,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
         * setSpec - A short string for the same of the set
         * setName - A longer description of the set
         * cql - The CQL command to find records in this set in the L<Catmandu::Store>
+    * xsl_stylesheet - Optional path to an xsl stylesheet
 
 Below is a sample minimal configuration for the 'sample.yml' demo above:
 
