@@ -152,8 +152,14 @@ TT
         }
     }
 
+    my $xsl_stylesheet = "";
+    if (my $xsl_path = $setting->{xsl_stylesheet}) {
+        $xsl_stylesheet = "<?xml-stylesheet type='text/xsl' href='$xsl_path' ?>";
+    }
+
     my $template_header = <<TT;
 <?xml version="1.0" encoding="UTF-8"?>
+$xsl_stylesheet
 <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
@@ -688,7 +694,7 @@ With the Catmandu configuration files in place records can be imported with the 
 The Dancer configuration file 'config.yml' contains basic information for the OAI-PMH plugin to work:
 
     * store - In which Catmandu::Store are the metadata records stored
-    * bag   - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
+    * bag - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
     * datestamp_field - Which field in the record contains a datestamp ('datestamp' in our example above)
     * repositoryName - The name of the repository
     * uri_base - The base URL of the repository
@@ -710,6 +716,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
         * setSpec - A short string for the same of the set
         * setName - A longer description of the set
         * cql - The CQL command to find records in this set in the L<Catmandu::Store>
+    * xsl_stylesheet - Optional path to an xsl stylesheet
 
 Below is a sample minimal configuration for the 'sample.yml' demo above:
 

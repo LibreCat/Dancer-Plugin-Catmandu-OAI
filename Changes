@@ -2,6 +2,7 @@ Revision history for Dancer-Plugin-Catmandu-OAI
 
 
 {{$NEXT}}
+  - xsl stylesheet support
 
 0.0310  2017-02-09 12:08:21 CET
   - fix bug in ListRecords if metatadata format has fixes
