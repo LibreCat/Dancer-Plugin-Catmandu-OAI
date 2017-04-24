@@ -1,7 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
-
 {{$NEXT}}
+  - make adminEmail repeatable
+  - support setDescription, compression and description
 
 0.04  2017-02-14 10:50:59 CET
   - xsl stylesheet support

@@ -115,7 +115,9 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * datestamp_field - Which field in the record contains a datestamp ('datestamp' in our example above)
     * repositoryName - The name of the repository
     * uri_base - The base URL of the repository
-    * adminEmail - An administrative email
+    * adminEmail - An administrative email. Can be string or array of strings. This will be included in the Identify response.
+    * compression - a compression encoding supported by the repository. Can be string or array of strings. This will be included in the Identify response.
+    * description - XML container that describes your repository. Can be string or array of strings. This will be included in the Identify response. Note that this module will try to validate the XML data.
     * earliestDatestamp - The earliest datestamp available in the dataset an YYYY-MM-DDTHH:MM:SSZ
     * deletedRecord - The policy for deleted records. See also: L<https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords>
     * repositoryIdentifier - A prefix to use in OAI-PMH identifiers
@@ -132,6 +134,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * sets - Optional an array of OAI-PMH sets and the CQL query to retrieve records in this set from the Catmandu::Store
         * setSpec - A short string for the same of the set
         * setName - A longer description of the set
+        * setDescription - an optional and repeatable container that may hold community-specific XML-encoded data about the set. Should be string or array of strings.
         * cql - The CQL command to find records in this set in the L<Catmandu::Store>
     * xsl_stylesheet - Optional path to an xsl stylesheet
 

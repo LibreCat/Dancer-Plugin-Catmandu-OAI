@@ -68,12 +68,13 @@
    "version" : "0.04",
    "x_contributors" : [
       "Nicolas Franck <Nicolas.Franck@ugent.be>",
+      "Nicolas Franck <njfranck@ca20c533.ugent.be>",
       "Nicolas Steenlant <nicolas.steenlant@gmail.com>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "njfranck <njfranck@ca20c521.ugent.be>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

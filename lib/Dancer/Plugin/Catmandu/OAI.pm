@@ -1,4 +1,4 @@
-package Dancer::Plugin::Catmandu::OAI; # TODO hierarchical sets, setDescription
+package Dancer::Plugin::Catmandu::OAI;
 
 =head1 NAME
 
@@ -9,7 +9,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 our $VERSION = '0.04';
 
 use Catmandu::Sane;
-use Catmandu::Util qw(:is);
+use Catmandu::Util qw(is_string is_array_ref);
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
@@ -208,16 +208,14 @@ $template_record_header
 $template_footer
 TT
 
-    my $adminEmailStr = '';
-    {
-        my $adminEmail = $setting->{adminEmail};
-        $adminEmail = is_array_ref( $adminEmail ) ? $adminEmail : is_string( $adminEmail ) ? [ $adminEmail ] : [];
-        $adminEmailStr = join('', map { "<adminEmail>$_</adminEmail>" } @$adminEmail);
-    }
+    my $admin_email = $setting->{adminEmail} // [];
+    $admin_email = [$admin_email] unless is_array_ref($admin_email);
+    $admin_email = join('', map { "<adminEmail>$_</adminEmail>" } @$admin_email);
+
     my @identify_extra_fields;
-    for my $i_field( qw( description compression ) ){
-        my $i_value = $setting->{$i_field};
-        $i_value = is_array_ref( $i_value ) ? $i_value : is_string($i_value) ? [$i_value] : [];
+    for my $i_field (qw(description compression)){
+        my $i_value = $setting->{$i_field} // [];
+        $i_value = [$i_value] unless is_array_ref($i_value);
         push @identify_extra_fields, join('', map { "<$i_field>$_</$i_field>" } @$i_value);
     }
 
@@ -227,7 +225,7 @@ $template_header
 <repositoryName>$setting->{repositoryName}</repositoryName>
 <baseURL>[% uri_base %]</baseURL>
 <protocolVersion>2.0</protocolVersion>
-$adminEmailStr
+$admin_email
 <earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
 <deletedRecord>$setting->{deletedRecord}</deletedRecord>
 <granularity>$setting->{granularity}</granularity>
@@ -314,14 +312,11 @@ TT
     <setName>$set->{setName}</setName>
 TT
 
-        my $setds = is_array_ref( $set->{setDescription} ) ? $set->{setDescription} : is_string( $set->{setDescription} ) ? [ $set->{setDescription} ] : [];
-        for my $setd (@$setds) {
+    my $set_descriptions = $set->{setDescription} // [];
+    $set_descriptions = [$set_descriptions] unless is_array_ref($set_descriptions);
+    $template_list_sets .= "<setDescription>$_</setDescription>" for @$set_descriptions;
 
-            $template_list_sets .= "<setDescription>$setd</setDescription>";
-
-        }
-
-        $template_list_sets .= <<TT;
+    $template_list_sets .= <<TT;
 </set>
 TT
     }
