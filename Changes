@@ -1,6 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+
+0.0403  2017-05-29 15:58:21 CEST
   - determine earliestDatestamp dynamically
 
 0.0402  2017-05-29 12:35:26 CEST
