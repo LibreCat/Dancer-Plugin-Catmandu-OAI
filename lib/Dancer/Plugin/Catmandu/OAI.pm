@@ -16,6 +16,7 @@ use Catmandu::Exporter::Template;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
+use DateTime::Format::ISO8601;
 use DateTime::Format::Strptime;
 use Clone qw(clone);
 
@@ -47,20 +48,6 @@ my $VERBS = {
         required => [],
     },
 };
-
-sub parse_oai_datestamp {
-    my ($date) = @_;
-    my @d = $date =~ /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/;
-    DateTime->new(
-        year      => $d[0],
-        month     => $d[1],
-        day       => $d[2],
-        hour      => $d[3],
-        minute    => $d[4],
-        second    => $d[5],
-        time_zone => 'UTC',
-    );
-}
 
 sub render {
     my ($tmpl, $data) = @_;
@@ -432,7 +419,6 @@ TT
                 cql_query => sprintf($setting->{get_record_cql_pattern}, $id),
                 start     => 0,
                 limit     => 1,
-
             )->first;
 
             if (defined $rec) {
@@ -470,8 +456,8 @@ TT
                     limit        => 1,
                     sru_sortkeys => $setting->{datestamp_field},
                 );
-                if (my $rec = $hits->[0]) {
-                    $format_datestamp->($rec->{$setting->{datestamp_field}};
+                if (my $rec = $hits->first) {
+                    $format_datestamp->($rec->{$setting->{datestamp_field}});
                 } else {
                     '1970-01-01T00:00:01Z';
                 }
@@ -513,8 +499,8 @@ TT
             my $cql_from  = $from;
             my $cql_until = $until;
             if (my $pattern = $setting->{datestamp_pattern}) {
-                $cql_from  = DateTime::Format::Strptime::strftime($pattern, parse_oai_datestamp($cql_from))  if $cql_from;
-                $cql_until = DateTime::Format::Strptime::strftime($pattern, parse_oai_datestamp($cql_until)) if $cql_until;
+                $cql_from = DateTime::Format::ISO8601->parse_datetime($from)->strftime($pattern) if $cql_from;
+                $cql_until = DateTime::Format::ISO8601->parse_datetime($until)->strftime($pattern) if $cql_until;
             }
 
             push @cql, qq|($setting->{cql_filter})| if $setting->{cql_filter};
@@ -739,7 +725,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * adminEmail - An administrative email. Can be string or array of strings. This will be included in the Identify response.
     * compression - a compression encoding supported by the repository. Can be string or array of strings. This will be included in the Identify response.
     * description - XML container that describes your repository. Can be string or array of strings. This will be included in the Identify response. Note that this module will try to validate the XML data.
-    * earliestDatestamp - The earliest datestamp available in the dataset an YYYY-MM-DDTHH:MM:SSZ
+    * earliestDatestamp - The earliest datestamp available in the dataset as YYYY-MM-DDTHH:MM:SSZ. This will be determined dynamically if no static value is given.
     * deletedRecord - The policy for deleted records. See also: L<https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords>
     * repositoryIdentifier - A prefix to use in OAI-PMH identifiers
     * cql_filter -  A CQL query to find all records in the database that should be made available to OAI-PMH
