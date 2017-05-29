@@ -1,6 +1,7 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+  - determine earliestDatestamp dynamically
 
 0.0402  2017-05-29 12:35:26 CEST
   - support bag id_key

@@ -37,11 +37,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Catmandu" : "0.8014",
+            "Catmandu" : "1.0",
             "Catmandu::Exporter::Template" : "0.03",
             "Clone" : "0.36",
             "Dancer" : "1.3123",
             "DateTime" : "1.08",
+            "DateTime::Format::ISO8601" : "0",
             "DateTime::Format::Strptime" : "0",
             "perl" : "v5.10.1"
          }
