@@ -78,7 +78,6 @@ sub oai_provider {
     my $setting = clone(plugin_setting);
 
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
-    $setting->{get_record_cql_pattern} //= '_id exact "%s"';
 
     # TODO this was for backwards compatibility. Remove?
     if ($setting->{filter}) {
@@ -334,6 +333,8 @@ TT
 
     my $bag = Catmandu->store($opts{store} || $setting->{store})->bag($opts{bag} || $setting->{bag});
 
+    $setting->{get_record_cql_pattern} ||= $bag->id_key.' exact "%s"';
+
     any ['get', 'post'] => $path => sub {
         my $uri_base = $setting->{uri_base} // request->uri_base;
         my $response_date = DateTime->now->iso8601.'Z';
@@ -538,11 +539,14 @@ TT
             if ($verb eq 'ListIdentifiers') {
                 $vars->{records} = [map {
                     my $rec = $_;
+                    my $id  = $rec->{$bag->id_key};
+
                     if ($fix) {
                         $rec = $fix->fix($rec);
                     }
+
                     {
-                        id        => $rec->{_id},
+                        id        => $id,
                         datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
                         deleted   => $sub_deleted->($rec),
                         setSpec   => $sub_set_specs_for->($rec),
@@ -552,16 +556,16 @@ TT
             } else {
                 $vars->{records} = [map {
                     my $rec = $_;
+                    my $id  = $rec->{$bag->id_key};
 
                     if ($fix) {
                         $rec = $fix->fix($rec);
                     }
 
-                    my $deleted = $sub_deleted->($rec);
                     my $rec_vars = {
-                        id        => $rec->{_id},
+                        id        => $id,
                         datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
-                        deleted   => $deleted,
+                        deleted   => $sub_deleted->($rec),
                         setSpec   => $sub_set_specs_for->($rec),
                     };
                     unless ($deleted) {
