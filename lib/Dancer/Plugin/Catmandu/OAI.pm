@@ -77,6 +77,8 @@ sub oai_provider {
 
     my $setting = clone(plugin_setting);
 
+    my $bag = Catmandu->store($opts{store} || $setting->{store})->bag($opts{bag} || $setting->{bag});
+
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
 
     # TODO this was for backwards compatibility. Remove?
@@ -99,6 +101,8 @@ sub oai_provider {
     } : sub {
         $_[0];
     };
+
+    $setting->{get_record_cql_pattern} ||= $bag->id_key.' exact "%s"';
 
     my $metadata_formats = do {
         my $list = $setting->{metadata_formats};
@@ -225,7 +229,7 @@ $template_header
 <baseURL>[% uri_base %]</baseURL>
 <protocolVersion>2.0</protocolVersion>
 $admin_email
-<earliestDatestamp>$setting->{earliestDatestamp}</earliestDatestamp>
+<earliestDatestamp>[% earliest_datestamp %]</earliestDatestamp>
 <deletedRecord>$setting->{deletedRecord}</deletedRecord>
 <granularity>$setting->{granularity}</granularity>
 <description>
@@ -330,10 +334,6 @@ TT
     }
     my $sub_deleted = $opts{deleted} || sub { 0 };
     my $sub_set_specs_for = $opts{set_specs_for} || sub { [] };
-
-    my $bag = Catmandu->store($opts{store} || $setting->{store})->bag($opts{bag} || $setting->{bag});
-
-    $setting->{get_record_cql_pattern} ||= $bag->id_key.' exact "%s"';
 
     any ['get', 'post'] => $path => sub {
         my $uri_base = $setting->{uri_base} // request->uri_base;
@@ -463,6 +463,19 @@ TT
             return render(\$template_error, $vars);
 
         } elsif ($verb eq 'Identify') {
+            $vars->{earliest_datestamp} = $setting->{earliestDatestamp} || do {
+                my $hits = $bag->search(
+                    %{ $setting->{default_search_params} },
+                    cql_query    => $setting->{cql_filter} || 'cql.allRecords',
+                    limit        => 1,
+                    sru_sortkeys => $setting->{datestamp_field},
+                );
+                if (my $rec = $hits->[0]) {
+                    $format_datestamp->($rec->{$setting->{datestamp_field}};
+                } else {
+                    '1970-01-01T00:00:01Z';
+                }
+            };
             return render(\$template_identify, $vars);
 
         } elsif ($verb eq 'ListIdentifiers' || $verb eq 'ListRecords') {
