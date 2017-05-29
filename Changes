@@ -1,6 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+
+0.0402  2017-05-29 12:35:26 CEST
   - support bag id_key
 
 0.0401  2017-04-24 13:54:38 CEST
