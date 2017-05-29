@@ -1,6 +1,7 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+  - support bag id_key
 
 0.0401  2017-04-24 13:54:38 CEST
   - make adminEmail repeatable

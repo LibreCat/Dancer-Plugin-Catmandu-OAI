@@ -562,10 +562,12 @@ TT
                         $rec = $fix->fix($rec);
                     }
 
+                    my $deleted = $sub_deleted->($rec);
+
                     my $rec_vars = {
                         id        => $id,
                         datestamp => $format_datestamp->($rec->{$setting->{datestamp_field}}),
-                        deleted   => $sub_deleted->($rec),
+                        deleted   => $deleted,
                         setSpec   => $sub_set_specs_for->($rec),
                     };
                     unless ($deleted) {
