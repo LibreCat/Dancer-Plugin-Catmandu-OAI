@@ -323,7 +323,7 @@ TT
     my $sub_set_specs_for = $opts{set_specs_for} || sub { [] };
 
     any ['get', 'post'] => $path => sub {
-        my $uri_base = $setting->{uri_base} // request->uri_base;
+        my $uri_base = $setting->{uri_base} // request->uri_for(request->path_info);
         my $response_date = DateTime->now->iso8601.'Z';
         my $params = request->is_get ? params('query') : params('body');
         my $errors = [];
@@ -721,7 +721,7 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * bag - In which Catmandu::Bag are the records of this 'store' (use: 'data' as default)
     * datestamp_field - Which field in the record contains a datestamp ('datestamp' in our example above)
     * repositoryName - The name of the repository
-    * uri_base - The base URL of the repository
+    * uri_base - The full base url of the OAI controller. To be used when behind a proxy server. When not set, this module relies on the Dancer request to provide its full url. Use middleware like 'ReverseProxy' or 'Dancer::Middleware::Rebase' in that case.
     * adminEmail - An administrative email. Can be string or array of strings. This will be included in the Identify response.
     * compression - a compression encoding supported by the repository. Can be string or array of strings. This will be included in the Identify response.
     * description - XML container that describes your repository. Can be string or array of strings. This will be included in the Identify response. Note that this module will try to validate the XML data.
