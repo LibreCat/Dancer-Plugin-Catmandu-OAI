@@ -1,6 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+
+0.0501  2017-08-31 15:16:24 CEST
   - fix template_options setting
 
 0.05  2017-08-18 11:11:03 CEST
