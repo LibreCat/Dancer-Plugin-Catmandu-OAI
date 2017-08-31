@@ -318,7 +318,7 @@ TT
         my ($tmpl, $data) = @_;
         content_type 'xml';
         my $out = "";
-        my $exporter = Catmandu::Exporter::Template->new(%$template_options, template => $tmpl, file => \$out);
+        my $exporter = Catmandu::Exporter::Template->new(template => $tmpl, file => \$out);
         $exporter->add($data);
         $exporter->commit;
         $out;
@@ -434,6 +434,7 @@ TT
                 $vars->{setSpec} = $sub_set_specs_for->($rec);
                 my $metadata = "";
                 my $exporter = Catmandu::Exporter::Template->new(
+                    %$template_options,
                     template => $format->{template},
                     file => \$metadata,
                 );
@@ -574,6 +575,7 @@ TT
                     unless ($deleted) {
                         my $metadata = "";
                         my $exporter = Catmandu::Exporter::Template->new(
+                            %$template_options,
                             template => $format->{template},
                             file     => \$metadata,
                         );
