@@ -407,17 +407,16 @@ TT
             if ($verb eq 'ListSets') {
                 push @$errors, [badResumptionToken => "resumptionToken isn't necessary"];
             } else {
-                my @parts = split '!', $params->{resumptionToken};
-
-                unless (@parts == 5) {
+                try {
+                    my $token = _serializer->deserialize($params->{resumptionToken});
+                    for (qw(set from until metadataPrefix)) {
+                        $params->{$_} = $token->{$_};
+                    }
+                    $vars->{token} = $token;
+                } catch {
                     push @$errors, [badResumptionToken => "resumptionToken is not in the correct format"];
-                }
+                };
 
-                $params->{set}            = $parts[0];
-                $params->{from}           = $parts[1];
-                $params->{until}          = $parts[2];
-                $params->{metadataPrefix} = $parts[3];
-                $vars->{start}            = $parts[4];
             }
         }
 
