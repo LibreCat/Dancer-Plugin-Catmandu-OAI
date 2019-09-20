@@ -13,6 +13,7 @@ use Catmandu::Util qw(is_string is_array_ref);
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
+use Catmandu::Serializer::messagepack;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
@@ -49,6 +50,32 @@ my $VERBS = {
     },
 };
 
+sub _serializer {
+    state $serializer = Catmandu::Serializer::messagepack->new;
+}
+
+sub _new_token {
+    my ($settings, $hits) = @_;
+
+    my $strategy = $settings->{search_strategy};
+
+    if ($strategy eq 'paginate' && $hits->more) {
+        return _add_token_values(@_, start => $hits->start + $hits->limit);
+    elsif ($strategy eq 'es.scroll' && exists $hits->{scroll_id}) {
+        return _add_token_values(@_, scroll_id => $hits->{scroll_id});
+    }
+    return;
+}
+
+sub _add_token_values {
+    my ($settings, $hits, $params, $from, $until, $token) = @_;
+    $token->{set}   = $params->{set} if defined $params->{set};
+    $token->{metadataPrefix} = $params->{metadataPrefix} if defined $params->{metadataPrefix};
+    $token->{from}  = $from if defined $from;
+    $token->{until} = $from if defined $until;
+    $token;
+}
+
 sub oai_provider {
     my ($path, %opts) = @_;
 
@@ -64,6 +91,8 @@ sub oai_provider {
     }
 
     $setting->{default_search_params} ||= {};
+
+    $setting->{search_strategy} //= 'paginate';
 
     my $datestamp_parser;
     if ($setting->{datestamp_pattern}) {
@@ -232,9 +261,9 @@ $template_header
 $template_record_header
 [%- END %]
 [%- IF token %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]">[% token %]</resumptionToken>
+<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
 [%- ELSE %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]"/>
+<resumptionToken completeListSize="[% total %]"/>
 [%- END %]
 </ListIdentifiers>
 $template_footer
@@ -254,9 +283,9 @@ $template_record_header
 </record>
 [%- END %]
 [%- IF token %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]">[% token %]</resumptionToken>
+<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
 [%- ELSE %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]"/>
+<resumptionToken completeListSize="[% total %]"/>
 [%- END %]
 </ListRecords>
 $template_footer
@@ -527,13 +556,8 @@ TT
                 return $render->(\$template_error, $vars);
             }
 
-            if ($start + $limit < $search->total) {
-                $vars->{token} = join '!',
-                    $params->{set} || '',
-                    $from ? $from : '',
-                    $until ? $until : '',
-                    $params->{metadataPrefix},
-                    $start + $limit;
+            if (defined(my $token = _new_token($setting, $hits, $params, $from, $until))) {
+                $vars->{token} = _serializer->serialize($token);
             }
 
             $vars->{total} = $search->total;
