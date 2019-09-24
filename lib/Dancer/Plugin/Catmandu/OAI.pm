@@ -13,6 +13,7 @@ use Catmandu::Util qw(is_string is_array_ref);
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
+use Catmandu::Serializer::messagepack;
 use Dancer::Plugin;
 use Dancer qw(:syntax);
 use DateTime;
@@ -49,6 +50,49 @@ my $VERBS = {
     },
 };
 
+sub _serializer {
+    state $serializer = Catmandu::Serializer::messagepack->new;
+}
+
+sub _new_token {
+    my ($settings, $hits) = @_;
+
+    my $strategy = $settings->{search_strategy};
+
+    if ($strategy eq 'paginate' && $hits->more) {
+        return _add_token_values(@_, {start => $hits->start + $hits->limit});
+    } elsif ($strategy eq 'es.scroll' && exists $hits->{scroll_id}) {
+        return _add_token_values(@_, {scroll_id => $hits->{scroll_id}});
+    }
+    return;
+}
+
+sub _add_token_values {
+    my ($settings, $hits, $params, $from, $until, $token) = @_;
+    $token->{_s} = $params->{set} if defined $params->{set};
+    $token->{_m} = $params->{metadataPrefix} if defined $params->{metadataPrefix};
+    $token->{_f} = $from if defined $from;
+    $token->{_u} = $from if defined $until;
+    $token;
+}
+
+sub _search {
+    my ($settings, $bag, $q, $token) = @_;
+    my %args = (
+        %{ $settings->{default_search_params} },
+        limit     => $settings->{limit} // $DEFAULT_LIMIT,
+        cql_query => $q,
+    );
+    if ($token) {
+        for my $key (qw(token start)) {
+            next unless exists $token->{$key};
+            $args{$key} = $token->{$key};
+            last;
+        }
+    }
+    $bag->search(%args);
+}
+
 sub oai_provider {
     my ($path, %opts) = @_;
 
@@ -64,6 +108,13 @@ sub oai_provider {
     }
 
     $setting->{default_search_params} ||= {};
+
+    $setting->{search_strategy} //= 'paginate';
+    # TODO expire scroll_id if finished
+    # TODO set resumptionToken expirationDate
+    if ($setting->{search_strategy} eq 'es.scroll') {
+        $setting->{default_search_params}{scroll} //= '2m'; 
+    }
 
     my $datestamp_parser;
     if ($setting->{datestamp_pattern}) {
@@ -232,9 +283,9 @@ $template_header
 $template_record_header
 [%- END %]
 [%- IF token %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]">[% token %]</resumptionToken>
+<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
 [%- ELSE %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]"/>
+<resumptionToken completeListSize="[% total %]"/>
 [%- END %]
 </ListIdentifiers>
 $template_footer
@@ -254,9 +305,9 @@ $template_record_header
 </record>
 [%- END %]
 [%- IF token %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]">[% token %]</resumptionToken>
+<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
 [%- ELSE %]
-<resumptionToken cursor="[% start %]" completeListSize="[% total %]"/>
+<resumptionToken completeListSize="[% total %]"/>
 [%- END %]
 </ListRecords>
 $template_footer
@@ -378,17 +429,17 @@ TT
             if ($verb eq 'ListSets') {
                 push @$errors, [badResumptionToken => "resumptionToken isn't necessary"];
             } else {
-                my @parts = split '!', $params->{resumptionToken};
-
-                unless (@parts == 5) {
+                try {
+                    my $token = _serializer->deserialize($params->{resumptionToken});
+                    $params->{set}            = $token->{_s};
+                    $params->{metadataPrefix} = $token->{_m};
+                    $params->{from}           = $token->{_f};
+                    $params->{until}          = $token->{_u};
+                    $vars->{token} = $token;
+                } catch {
                     push @$errors, [badResumptionToken => "resumptionToken is not in the correct format"];
-                }
+                };
 
-                $params->{set}            = $parts[0];
-                $params->{from}           = $parts[1];
-                $params->{until}          = $parts[2];
-                $params->{metadataPrefix} = $parts[3];
-                $vars->{start}            = $parts[4];
             }
         }
 
@@ -468,8 +519,6 @@ TT
             return $render->(\$template_identify, $vars);
 
         } elsif ($verb eq 'ListIdentifiers' || $verb eq 'ListRecords') {
-            my $limit = $setting->{limit} // $DEFAULT_LIMIT;
-            my $start = $vars->{start} //= 0;
             my $from  = $params->{from};
             my $until = $params->{until};
 
@@ -515,25 +564,15 @@ TT
                 push @cql, "(cql.allRecords)";
             }
 
-            my $search = $bag->search(
-                %{ $setting->{default_search_params} },
-                cql_query => join(' and ', @cql),
-                limit     => $limit,
-                start     => $start,
-            );
+            my $search = _search($setting, $bag, join(' and ', @cql), $vars->{token});
 
             unless ($search->total) {
                 push @$errors, [noRecordsMatch => "no records found"];
                 return $render->(\$template_error, $vars);
             }
 
-            if ($start + $limit < $search->total) {
-                $vars->{token} = join '!',
-                    $params->{set} || '',
-                    $from ? $from : '',
-                    $until ? $until : '',
-                    $params->{metadataPrefix},
-                    $start + $limit;
+            if (defined(my $token = _new_token($setting, $search, $params, $from, $until))) {
+                $vars->{token} = _serializer->serialize($token);
             }
 
             $vars->{total} = $search->total;
@@ -733,6 +772,8 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * deletedRecord - The policy for deleted records. See also: L<https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords>
     * repositoryIdentifier - A prefix to use in OAI-PMH identifiers
     * cql_filter -  A CQL query to find all records in the database that should be made available to OAI-PMH
+    * default_search_params - set default arguments that get passed to every call to the bag's search method
+    * search_strategy - default is C<paginate>, set to C<es.scroll> to avoid deep paging (Elasticsearch only)
     * limit - The maximum number of records to be returned in each OAI-PMH request
     * delimiter - Delimiters used in prefixing a record identifier with a repositoryIdentifier (use: ':' as default)
     * sampleIdentifier - A sample identifier
