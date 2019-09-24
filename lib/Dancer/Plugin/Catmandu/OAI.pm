@@ -60,20 +60,37 @@ sub _new_token {
     my $strategy = $settings->{search_strategy};
 
     if ($strategy eq 'paginate' && $hits->more) {
-        return _add_token_values(@_, start => $hits->start + $hits->limit);
-    elsif ($strategy eq 'es.scroll' && exists $hits->{scroll_id}) {
-        return _add_token_values(@_, scroll_id => $hits->{scroll_id});
+        return _add_token_values(@_, {start => $hits->start + $hits->limit});
+    } elsif ($strategy eq 'es.scroll' && exists $hits->{scroll_id}) {
+        return _add_token_values(@_, {scroll_id => $hits->{scroll_id}});
     }
     return;
 }
 
 sub _add_token_values {
     my ($settings, $hits, $params, $from, $until, $token) = @_;
-    $token->{set}   = $params->{set} if defined $params->{set};
-    $token->{metadataPrefix} = $params->{metadataPrefix} if defined $params->{metadataPrefix};
-    $token->{from}  = $from if defined $from;
-    $token->{until} = $from if defined $until;
+    $token->{_s} = $params->{set} if defined $params->{set};
+    $token->{_m} = $params->{metadataPrefix} if defined $params->{metadataPrefix};
+    $token->{_f} = $from if defined $from;
+    $token->{_u} = $from if defined $until;
     $token;
+}
+
+sub _search {
+    my ($settings, $bag, $q, $token) = @_;
+    my %args = (
+        %{ $settings->{default_search_params} },
+        limit     => $settings->{limit} // $DEFAULT_LIMIT,
+        cql_query => $q,
+    );
+    if ($token) {
+        for my $key (qw(token start)) {
+            next unless exists $token->{$key};
+            $args{$key} = $token->{$key};
+            last;
+        }
+    }
+    $bag->search(%args);
 }
 
 sub oai_provider {
@@ -93,6 +110,11 @@ sub oai_provider {
     $setting->{default_search_params} ||= {};
 
     $setting->{search_strategy} //= 'paginate';
+    # TODO expire scroll_id if finished
+    # TODO set resumptionToken expirationDate
+    if ($setting->{search_strategy} eq 'es.scroll') {
+        $setting->{default_search_params}{scroll} //= '2m'; 
+    }
 
     my $datestamp_parser;
     if ($setting->{datestamp_pattern}) {
@@ -409,9 +431,10 @@ TT
             } else {
                 try {
                     my $token = _serializer->deserialize($params->{resumptionToken});
-                    for (qw(set from until metadataPrefix)) {
-                        $params->{$_} = $token->{$_};
-                    }
+                    $params->{set}            = $token->{_s};
+                    $params->{metadataPrefix} = $token->{_m};
+                    $params->{from}           = $token->{_f};
+                    $params->{until}          = $token->{_u};
                     $vars->{token} = $token;
                 } catch {
                     push @$errors, [badResumptionToken => "resumptionToken is not in the correct format"];
@@ -496,8 +519,6 @@ TT
             return $render->(\$template_identify, $vars);
 
         } elsif ($verb eq 'ListIdentifiers' || $verb eq 'ListRecords') {
-            my $limit = $setting->{limit} // $DEFAULT_LIMIT;
-            my $start = $vars->{start} //= 0;
             my $from  = $params->{from};
             my $until = $params->{until};
 
@@ -543,19 +564,14 @@ TT
                 push @cql, "(cql.allRecords)";
             }
 
-            my $search = $bag->search(
-                %{ $setting->{default_search_params} },
-                cql_query => join(' and ', @cql),
-                limit     => $limit,
-                start     => $start,
-            );
+            my $search = _search($setting, $bag, join(' and ', @cql), $vars->{token});
 
             unless ($search->total) {
                 push @$errors, [noRecordsMatch => "no records found"];
                 return $render->(\$template_error, $vars);
             }
 
-            if (defined(my $token = _new_token($setting, $hits, $params, $from, $until))) {
+            if (defined(my $token = _new_token($setting, $search, $params, $from, $until))) {
                 $vars->{token} = _serializer->serialize($token);
             }
 
@@ -756,6 +772,8 @@ The Dancer configuration file 'config.yml' contains basic information for the OA
     * deletedRecord - The policy for deleted records. See also: L<https://www.openarchives.org/OAI/openarchivesprotocol.html#DeletedRecords>
     * repositoryIdentifier - A prefix to use in OAI-PMH identifiers
     * cql_filter -  A CQL query to find all records in the database that should be made available to OAI-PMH
+    * default_search_params - set default arguments that get passed to every call to the bag's search method
+    * search_strategy - default is C<paginate>, set to C<es.scroll> to avoid deep paging (Elasticsearch only)
     * limit - The maximum number of records to be returned in each OAI-PMH request
     * delimiter - Delimiters used in prefixing a record identifier with a repositoryIdentifier (use: ':' as default)
     * sampleIdentifier - A sample identifier

@@ -1,6 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+  - add a new search_strategy setting with possible values 'paginate' (the
+    default) and 'es.scroll'
   - fix template_options setting
 
 0.05  2017-08-18 11:11:03 CEST
