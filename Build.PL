@@ -25,12 +25,13 @@ my %module_build_args = (
   "requires" => {
     "Catmandu" => "1.0",
     "Catmandu::Exporter::Template" => "0.11",
-    "Catmandu::Serializer::messagepack" => 0,
     "Clone" => "0.36",
     "Dancer" => "1.3123",
+    "Data::MessagePack" => "1.00",
     "DateTime" => "1.08",
     "DateTime::Format::ISO8601" => 0,
     "DateTime::Format::Strptime" => 0,
+    "MIME::Base64" => 0,
     "perl" => "v5.10.1"
   },
   "test_requires" => {

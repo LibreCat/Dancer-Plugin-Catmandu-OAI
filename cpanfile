@@ -8,8 +8,9 @@ on test => sub {
 requires 'Dancer', '1.3123';
 requires 'Catmandu', '1.0';
 requires 'Catmandu::Exporter::Template', '0.11';
-requires 'Catmandu::Serializer::messagepack', 0;
+requires 'Clone', '0.36';
+requires 'Data::MessagePack', '1.00';
 requires 'DateTime', '1.08';
 requires 'DateTime::Format::ISO8601', 0;
 requires 'DateTime::Format::Strptime', 0;
-requires 'Clone', '0.36';
+requires 'MIME::Base64', 0;
