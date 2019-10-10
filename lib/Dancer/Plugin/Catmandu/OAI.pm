@@ -114,14 +114,14 @@ sub oai_provider {
         $setting->{cql_filter} = delete $setting->{filter};
     }
 
-    $setting->{default_search_params} ||= {};
+    $setting->{default_search_params} //= {};
 
     $setting->{search_strategy} //= 'paginate';
 
     # TODO expire scroll_id if finished
     # TODO set resumptionToken expirationDate
     if ($setting->{search_strategy} eq 'es.scroll') {
-        $setting->{default_search_params}{scroll} //= '2m';
+        $setting->{default_search_params}{scroll} //= '10m';
     }
 
     my $datestamp_parser;
