@@ -85,7 +85,8 @@ sub _new_token {
     }
     elsif ($strategy eq 'es.scroll' && exists $hits->{scroll_id}) {
         $token = {scroll_id => $hits->{scroll_id}};
-    } else {
+    }
+    else {
         return;
     }
 
@@ -317,8 +318,8 @@ $template_header
 [%- FOREACH records %]
 $template_record_header
 [%- END %]
-[%- IF token %]
-<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
+[%- IF resumption_token %]
+<resumptionToken completeListSize="[% total %]">[% resumption_token %]</resumptionToken>
 [%- ELSE %]
 <resumptionToken completeListSize="[% total %]"/>
 [%- END %]
@@ -339,8 +340,8 @@ $template_record_header
 [%- END %]
 </record>
 [%- END %]
-[%- IF token %]
-<resumptionToken completeListSize="[% total %]">[% token %]</resumptionToken>
+[%- IF resumption_token %]
+<resumptionToken completeListSize="[% total %]">[% resumption_token %]</resumptionToken>
 [%- ELSE %]
 <resumptionToken completeListSize="[% total %]"/>
 [%- END %]
@@ -662,13 +663,14 @@ TT
 
             if (
                 defined(
-                    my $token
-                        = _new_token($setting, $search, $params, $from,
-                        $until, $vars->{token})
+                    my $new_token = _new_token(
+                        $setting, $search, $params,
+                        $from,    $until,  $vars->{token}
+                    )
                 )
                 )
             {
-                $vars->{token} = _serialize($token);
+                $vars->{resumption_token} = _serialize($new_token);
             }
 
             $vars->{total} = $search->total;
