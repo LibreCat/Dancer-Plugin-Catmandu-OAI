@@ -472,7 +472,7 @@ TT
 
         $vars->{params} = $params;
 
-        if ($params->{resumptionToken}) {
+        if (exists $params->{resumptionToken}) {
             unless (is_string($params->{resumptionToken})) {
                 push @$errors,
                     [badResumptionToken =>
@@ -503,7 +503,7 @@ TT
             }
         }
 
-        if ($params->{set}) {
+        if (exists $params->{set}) {
             unless ($sets) {
                 push @$errors, [noSetHierarchy => "sets are not supported"];
             }
@@ -512,11 +512,11 @@ TT
             }
         }
 
-        if (my $prefix = $params->{metadataPrefix}) {
-            unless ($format = $metadata_formats->{$prefix}) {
+        if (exists $params->{metadataPrefix}) {
+            unless ($format = $metadata_formats->{$params->{metadataPrefix}}) {
                 push @$errors,
                     [cannotDisseminateFormat =>
-                        "metadataPrefix $prefix is not supported"
+                        "metadataPrefix $params->{metadataPrefix} is not supported"
                     ];
             }
         }

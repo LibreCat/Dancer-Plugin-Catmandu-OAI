@@ -1,6 +1,7 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+  - stricter query parameter checking
 
 0.0503  2019-10-11 12:11:25 CEST
   - fix resumptionToken handling bugs
