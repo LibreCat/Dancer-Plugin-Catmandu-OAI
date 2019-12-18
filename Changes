@@ -1,6 +1,7 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+  - fix bug in resumptionToken deserializing
 
 0.0505  2019-11-12 09:41:00 CET
   - specify required version of MIME::Base64
