@@ -21,8 +21,8 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 # DESCRIPTION
 
-[Dancer::Plugin::Catmandu::OAI](https://metacpan.org/pod/Dancer::Plugin::Catmandu::OAI) is a Dancer plugin to provide OAI-PMH services for [Catmandu::Store](https://metacpan.org/pod/Catmandu::Store)-s that support
-CQL (such as [Catmandu::Store::ElasticSearch](https://metacpan.org/pod/Catmandu::Store::ElasticSearch)). Follow the installation steps below to setup your own OAI-PMH server.
+[Dancer::Plugin::Catmandu::OAI](https://metacpan.org/pod/Dancer%3A%3APlugin%3A%3ACatmandu%3A%3AOAI) is a Dancer plugin to provide OAI-PMH services for [Catmandu::Store](https://metacpan.org/pod/Catmandu%3A%3AStore)-s that support
+CQL (such as [Catmandu::Store::ElasticSearch](https://metacpan.org/pod/Catmandu%3A%3AStore%3A%3AElasticSearch)). Follow the installation steps below to setup your own OAI-PMH server.
 
 # REQUIREMENTS
 
@@ -169,7 +169,7 @@ Below is a sample minimal configuration for the 'sample.yml' demo above:
 
 # METADATAPREFIX TEMPLATE
 
-For each metadataPrefix a Template Toolkit file needs to exist which translate [Catmandu::Store](https://metacpan.org/pod/Catmandu::Store) records into XML records. At least
+For each metadataPrefix a Template Toolkit file needs to exist which translate [Catmandu::Store](https://metacpan.org/pod/Catmandu%3A%3AStore) records into XML records. At least
 one Template Toolkit file should be made available to transform stored records into Dublin Core. The example below contains an example file to
 transform 'sample.yml' type records into Dublin Core:
 
@@ -221,7 +221,7 @@ If all the required files are available, then a Dancer application can be starte
 
 # SEE ALSO
 
-[Dancer](https://metacpan.org/pod/Dancer), [Catmandu](https://metacpan.org/pod/Catmandu), [Catmandu::Store](https://metacpan.org/pod/Catmandu::Store)
+[Dancer](https://metacpan.org/pod/Dancer), [Catmandu](https://metacpan.org/pod/Catmandu), [Catmandu::Store](https://metacpan.org/pod/Catmandu%3A%3AStore)
 
 # AUTHOR
 

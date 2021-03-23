@@ -4,7 +4,7 @@
 .perl-version
 .tidyall.d/
 Build
-Dancer-Plugin-*
+/Dancer-Plugin-*
 demo/logs
 LICENSE
 MANIFEST*
