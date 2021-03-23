@@ -1,6 +1,7 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
 {{$NEXT}}
+  - fix until bug
 
 0.0506  2019-12-18 10:34:40 CET
   - fix bug in resumptionToken deserializing
