@@ -126,8 +126,12 @@ sub oai_provider {
 
     my $setting = clone(plugin_setting);
 
-    my $bag = Catmandu->store($opts{store} || $setting->{store})
-        ->bag($opts{bag} || $setting->{bag});
+    foreach my $key (keys %opts) {
+        $setting->{$key} = $opts{$key};
+    }
+
+    my $bag = Catmandu->store($setting->{store})
+        ->bag($setting->{bag});
 
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
 
@@ -394,7 +398,7 @@ TT
 $template_footer
 TT
 
-    my $fix = $opts{fix} || $setting->{fix};
+    my $fix = $setting->{fix};
     if ($fix) {
         $fix = Catmandu::Fix->new(fixes => $fix);
     }
