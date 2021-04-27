@@ -9,7 +9,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 our $VERSION = '0.0506';
 
 use Catmandu::Sane;
-use Catmandu::Util qw(is_string is_array_ref);
+use Catmandu::Util qw(is_string is_array_ref hash_merge);
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
@@ -20,7 +20,6 @@ use Dancer qw(:syntax);
 use DateTime;
 use DateTime::Format::ISO8601;
 use DateTime::Format::Strptime;
-use Clone qw(clone);
 
 my $DEFAULT_LIMIT = 100;
 
@@ -124,11 +123,7 @@ sub _search {
 sub oai_provider {
     my ($path, %opts) = @_;
 
-    my $setting = clone(plugin_setting);
-
-    foreach my $key (keys %opts) {
-        $setting->{$key} = $opts{$key};
-    }
+    my $setting = hash_merge(plugin_setting, \%opts);
 
     my $bag = Catmandu->store($setting->{store})
         ->bag($setting->{bag});
