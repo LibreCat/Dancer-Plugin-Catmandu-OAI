@@ -9,7 +9,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 our $VERSION = '0.0507';
 
 use Catmandu::Sane;
-use Catmandu::Util qw(is_string is_array_ref);
+use Catmandu::Util qw(is_string is_array_ref hash_merge);
 use Catmandu;
 use Catmandu::Fix;
 use Catmandu::Exporter::Template;
@@ -20,7 +20,6 @@ use Dancer qw(:syntax);
 use DateTime;
 use DateTime::Format::ISO8601;
 use DateTime::Format::Strptime;
-use Clone qw(clone);
 
 my $DEFAULT_LIMIT = 100;
 
@@ -124,10 +123,9 @@ sub _search {
 sub oai_provider {
     my ($path, %opts) = @_;
 
-    my $setting = clone(plugin_setting);
+    my $setting = hash_merge(plugin_setting, \%opts);
 
-    my $bag = Catmandu->store($opts{store} || $setting->{store})
-        ->bag($opts{bag} || $setting->{bag});
+    my $bag = Catmandu->store($setting->{store})->bag($setting->{bag});
 
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
 
@@ -394,7 +392,7 @@ TT
 $template_footer
 TT
 
-    my $fix = $opts{fix} || $setting->{fix};
+    my $fix = $setting->{fix};
     if ($fix) {
         $fix = Catmandu::Fix->new(fixes => $fix);
     }
@@ -487,11 +485,12 @@ TT
             else {
                 try {
                     my $token = _deserialize($params->{resumptionToken});
-                    $params->{set}            = $token->{_s} if defined $token->{_s};
-                    $params->{metadataPrefix} = $token->{_m} if defined $token->{_m};
-                    $params->{from}           = $token->{_f} if defined $token->{_f};
-                    $params->{until}          = $token->{_u} if defined $token->{_u};
-                    $vars->{token}            = $token;
+                    $params->{set} = $token->{_s} if defined $token->{_s};
+                    $params->{metadataPrefix} = $token->{_m}
+                        if defined $token->{_m};
+                    $params->{from}  = $token->{_f} if defined $token->{_f};
+                    $params->{until} = $token->{_u} if defined $token->{_u};
+                    $vars->{token}   = $token;
                 }
                 catch {
                     push @$errors,
@@ -513,7 +512,8 @@ TT
         }
 
         if (exists $params->{metadataPrefix}) {
-            unless ($format = $metadata_formats->{$params->{metadataPrefix}}) {
+            unless ($format = $metadata_formats->{$params->{metadataPrefix}})
+            {
                 push @$errors,
                     [cannotDisseminateFormat =>
                         "metadataPrefix $params->{metadataPrefix} is not supported"
