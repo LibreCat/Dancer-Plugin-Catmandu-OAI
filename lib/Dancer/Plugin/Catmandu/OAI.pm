@@ -125,8 +125,7 @@ sub oai_provider {
 
     my $setting = hash_merge(plugin_setting, \%opts);
 
-    my $bag = Catmandu->store($setting->{store})
-        ->bag($setting->{bag});
+    my $bag = Catmandu->store($setting->{store})->bag($setting->{bag});
 
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
 
@@ -486,11 +485,12 @@ TT
             else {
                 try {
                     my $token = _deserialize($params->{resumptionToken});
-                    $params->{set}            = $token->{_s} if defined $token->{_s};
-                    $params->{metadataPrefix} = $token->{_m} if defined $token->{_m};
-                    $params->{from}           = $token->{_f} if defined $token->{_f};
-                    $params->{until}          = $token->{_u} if defined $token->{_u};
-                    $vars->{token}            = $token;
+                    $params->{set} = $token->{_s} if defined $token->{_s};
+                    $params->{metadataPrefix} = $token->{_m}
+                        if defined $token->{_m};
+                    $params->{from}  = $token->{_f} if defined $token->{_f};
+                    $params->{until} = $token->{_u} if defined $token->{_u};
+                    $vars->{token}   = $token;
                 }
                 catch {
                     push @$errors,
@@ -512,7 +512,8 @@ TT
         }
 
         if (exists $params->{metadataPrefix}) {
-            unless ($format = $metadata_formats->{$params->{metadataPrefix}}) {
+            unless ($format = $metadata_formats->{$params->{metadataPrefix}})
+            {
                 push @$errors,
                     [cannotDisseminateFormat =>
                         "metadataPrefix $params->{metadataPrefix} is not supported"
