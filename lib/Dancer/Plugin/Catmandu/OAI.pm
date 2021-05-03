@@ -93,7 +93,7 @@ sub _new_token {
     $token->{_s} = $params->{set} if defined $params->{set};
     $token->{_m} = $params->{metadataPrefix}
         if defined $params->{metadataPrefix};
-    $token->{_f} = $from if defined $from;
+    $token->{_f} = $from  if defined $from;
     $token->{_u} = $until if defined $until;
     $token;
 }
