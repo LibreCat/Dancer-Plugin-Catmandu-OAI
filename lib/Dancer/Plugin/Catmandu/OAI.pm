@@ -580,7 +580,7 @@ TT
                     %{$setting->{default_search_params}},
                     cql_query => $setting->{cql_filter} || 'cql.allRecords',
                     limit     => 1,
-                    sru_sortkeys => $setting->{datestamp_index},
+                    sru_sortkeys => "$setting->{datestamp_index},,1",
                 );
                 if (my $rec = $hits->first) {
                     $format_datestamp->($rec->{$setting->{datestamp_field}});
