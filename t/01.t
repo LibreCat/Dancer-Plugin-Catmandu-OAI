@@ -35,5 +35,5 @@ foreach my $oai_route (qw(oai oai_override)) {
 $res = dancer_response("GET", '/oai_override', {params => {verb => "Identify"}});
 like $res->{content}, qr/request verb="Identify"/, "Identify for oai_override";
 like $res->{content}, qr/override_my_mail/, "Override successful";
-note $res->{content};
+
 done_testing;
