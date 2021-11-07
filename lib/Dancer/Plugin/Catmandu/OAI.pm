@@ -20,6 +20,8 @@ use Dancer qw(:syntax);
 use DateTime;
 use DateTime::Format::ISO8601;
 use DateTime::Format::Strptime;
+use Scalar::Util qw(blessed);
+use Clone 'clone';
 
 my $DEFAULT_LIMIT = 100;
 
@@ -123,9 +125,14 @@ sub _search {
 sub oai_provider {
     my ($path, %opts) = @_;
 
-    my $setting = hash_merge(plugin_setting, \%opts);
+    my $setting = hash_merge(clone plugin_setting, \%opts);
 
-    my $bag = Catmandu->store($setting->{store})->bag($setting->{bag});
+    foreach my $key (keys %opts) {
+        $setting->{$key} = $opts{$key};
+    }
+
+    my $store = defined blessed($setting->{store}) ? $setting->{store} : Catmandu->store($setting->{store});
+    my $bag = $store->bag($setting->{bag});
 
     $setting->{granularity} //= "YYYY-MM-DDThh:mm:ssZ";
 
@@ -984,6 +991,20 @@ If all the required files are available, then a Dancer application can be starte
     $ curl "http://localhost:3000/oai?verb=ListIdentifiers&metadataPrefix=oai_dc"
     $ curl "http://localhost:3000/oai?verb=ListRecords&metadataPrefix=oai_dc"
 
+=head1 ELASTICSEARCH NODES
+
+Additional Elasticsearch options, such as which node(s) to connect to, can be passed in by
+constructing the Catmandu store directly:
+
+    my $options = {
+      store => Catmandu->store('oai', nodes => [$ENV{'ES_HOST'} || 'localhost:9200']),
+    };
+
+    oai_provider '/oai', %$options;
+
+In this example, we read the hostname from the environment variable `ES_HOST`,
+defaulting to localhost:9200 if the variable is empty or not set.
+
 =head1 SEE ALSO
 
 L<Dancer>, L<Catmandu>, L<Catmandu::Store>
@@ -999,6 +1020,8 @@ Nicolas Franck, C<< <nicolas.franck at ugent.be> >>
 Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>
 
 Patrick Hochstenbach, C<< <patric.hochstenbach at ugent.be> >>
+
+Dan Michael Heggø, C<< <dan.michael.heggo at bibsent.no> >>
 
 =head1 LICENSE
 
