@@ -21,6 +21,7 @@ use DateTime;
 use DateTime::Format::ISO8601;
 use DateTime::Format::Strptime;
 use Scalar::Util qw(blessed);
+use Clone 'clone';
 
 my $DEFAULT_LIMIT = 100;
 
@@ -124,7 +125,7 @@ sub _search {
 sub oai_provider {
     my ($path, %opts) = @_;
 
-    my $setting = hash_merge(plugin_setting, \%opts);
+    my $setting = hash_merge(clone plugin_setting, \%opts);
 
     foreach my $key (keys %opts) {
         $setting->{$key} = $opts{$key};
